@@ -122,8 +122,8 @@
   .flex-row .ft{ font-weight:700; font-size:14px; width:120px; flex-shrink:0; }
   .flex-row input[type=text]{ flex:1; border:1px solid transparent; background:transparent; font-size:13px; color:var(--color-text-muted); padding:4px 6px; border-radius:6px; text-overflow:ellipsis; }
   .flex-row input[type=text]:focus{ outline:none; border-color:var(--color-border); background:var(--color-bg); color:var(--color-text); }
-  .flex-row .x{ background:none; border:none; color:var(--color-text-muted); cursor:pointer; font-size:16px; line-height:1; padding:4px; }
-  .flex-row .x:hover{ color:#dc2626; }
+  .x{ background:none; border:none; color:var(--color-text-muted); cursor:pointer; font-size:16px; line-height:1; padding:4px; }
+  .x:hover{ color:#dc2626; }
   .flex-add{ display:flex; gap:8px; padding:12px 14px; }
   .flex-add input{ border:1px solid var(--color-border); border-radius:6px; padding:7px 8px; font-size:13px; }
   .flex-add input.title{ width:120px; flex-shrink:0; }
@@ -142,6 +142,34 @@
   .backup-btn{ background:none; border:none; padding:0; color:var(--color-accent); font-size:11px; font-weight:600; cursor:pointer; text-decoration:underline; }
   .backup-btn:hover{ color:var(--color-accent-hover); }
 
+  /* Tabs */
+  .tab-nav{ display:flex; gap:4px; margin-top:18px; border-bottom:1px solid var(--color-border); }
+  .tab-btn{ background:none; border:none; padding:10px 16px; font-size:14px; font-weight:600; color:var(--color-text-muted); cursor:pointer; border-radius:8px 8px 0 0; position:relative; bottom:-1px; border-bottom:2px solid transparent; transition:color 150ms ease-out, border-color 150ms ease-out; }
+  .tab-btn:hover{ color:var(--color-text); }
+  .tab-btn.active{ color:var(--color-accent); border-bottom-color:var(--color-accent); }
+  .tab-panel{ margin-top:24px; }
+
+  /* Budget table */
+  .meal-table .num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .meal-table input[type=number].qty-input{ width:100%; text-align:right; }
+  .grand-total-row td{ font-weight:800; border-top:2px solid var(--color-border); border-bottom:none; padding-top:12px; }
+  .grand-total-row .grand-total-label{ text-align:right; }
+  .col-num{ width:32px; }
+  .col-qty{ width:90px; }
+  .col-price{ width:100px; }
+  .col-amount{ width:110px; }
+  .col-del{ width:36px; }
+
+  @media (max-width:480px){
+    .col-num{ width:20px; }
+    .col-qty{ width:52px; }
+    .col-price{ width:58px; }
+    .col-amount{ width:66px; }
+    #budgetTable td, #budgetTable th{ padding:6px 5px; }
+    #budgetTable input[type=number]{ padding:5px 2px; font-size:12px; }
+    #budgetTable input[type=text]{ padding:5px 6px; font-size:12px; }
+  }
+
   @media (max-width:480px){
     h1{ font-size:22px; }
     .toolbar{ flex-direction:column; align-items:flex-start; }
@@ -157,39 +185,47 @@
     <p class="sub">College classes, work shifts, and personal routine, one week at a glance.</p>
   </header>
 
-  <div class="toolbar">
-    <div class="legend">
-      <span class="legend-item"><span class="dot college"></span>College</span>
-      <span class="legend-item"><span class="dot personal"></span>Personal</span>
-      <span class="legend-item"><span class="dot other"></span>Work / other</span>
-    </div>
-    <div style="display:flex; align-items:center; gap:14px;">
-      <button class="btn btn-ghost" id="resetBtn">Clear schedule</button>
-      <span style="width:1px; height:20px; background:var(--color-border);" aria-hidden="true"></span>
-      <button class="btn btn-primary" id="addBtnTop">+ Add block</button>
-    </div>
-  </div>
-  <p class="hint">Tap + to add a block, or double-click an empty slot on desktop. Click any block to edit or delete it.</p>
-
-  <div class="grid-scroll" id="gridScroll">
-    <div class="grid" id="grid"></div>
-    <div class="empty-hint" id="emptyHint">Nothing here yet — tap "+ Add block" to start filling in your week.</div>
-    <div class="scroll-fade left" id="fadeLeft"></div>
-    <div class="scroll-fade right" id="fadeRight"></div>
+  <div class="tab-nav" role="tablist">
+    <button type="button" class="tab-btn active" id="tabBtnSchedule" data-tab="schedule" role="tab" aria-selected="true" aria-controls="tab-schedule">Schedule</button>
+    <button type="button" class="tab-btn" id="tabBtnMeals" data-tab="meals" role="tab" aria-selected="false" aria-controls="tab-meals">Meals</button>
+    <button type="button" class="tab-btn" id="tabBtnBudget" data-tab="budget" role="tab" aria-selected="false" aria-controls="tab-budget">Budget</button>
   </div>
 
-  <section>
-    <h2>Flexible — no fixed time yet</h2>
-    <div class="flex-list" id="flexList"></div>
-    <div class="flex-add">
-      <input type="text" class="title" id="flexTitleInput" placeholder="New item" />
-      <input type="text" class="detail" id="flexDetailInput" placeholder="Detail (e.g. days, duration)" />
-      <button class="btn btn-primary btn-sm" id="flexAddBtn">Add</button>
+  <section id="tab-schedule" class="tab-panel" role="tabpanel">
+    <div class="toolbar">
+      <div class="legend">
+        <span class="legend-item"><span class="dot college"></span>College</span>
+        <span class="legend-item"><span class="dot personal"></span>Personal</span>
+        <span class="legend-item"><span class="dot other"></span>Work / other</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="btn btn-ghost" id="resetBtn">Clear schedule</button>
+        <span style="width:1px; height:20px; background:var(--color-border);" aria-hidden="true"></span>
+        <button class="btn btn-primary" id="addBtnTop">+ Add block</button>
+      </div>
     </div>
-    <p class="hint">Give any of these a clock time and I can move it onto the grid above.</p>
+    <p class="hint">Tap + to add a block, or double-click an empty slot on desktop. Click any block to edit or delete it.</p>
+
+    <div class="grid-scroll" id="gridScroll">
+      <div class="grid" id="grid"></div>
+      <div class="empty-hint" id="emptyHint">Nothing here yet — tap "+ Add block" to start filling in your week.</div>
+      <div class="scroll-fade left" id="fadeLeft"></div>
+      <div class="scroll-fade right" id="fadeRight"></div>
+    </div>
+
+    <section>
+      <h2>Flexible — no fixed time yet</h2>
+      <div class="flex-list" id="flexList"></div>
+      <div class="flex-add">
+        <input type="text" class="title" id="flexTitleInput" placeholder="New item" />
+        <input type="text" class="detail" id="flexDetailInput" placeholder="Detail (e.g. days, duration)" />
+        <button class="btn btn-primary btn-sm" id="flexAddBtn">Add</button>
+      </div>
+      <p class="hint">Give any of these a clock time and I can move it onto the grid above.</p>
+    </section>
   </section>
 
-  <section>
+  <section id="tab-meals" class="tab-panel" role="tabpanel" hidden>
     <h2>This week's meals</h2>
     <table class="meal-table" id="mealTable">
       <thead>
@@ -203,6 +239,32 @@
       <button type="button" class="backup-btn" id="importBtn">Import backup</button>
       <input type="file" id="importFile" accept="application/json" style="display:none;" />
     </p>
+  </section>
+
+  <section id="tab-budget" class="tab-panel" role="tabpanel" hidden>
+    <h2>Monthly expenditure</h2>
+    <table class="meal-table" id="budgetTable">
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th>Item</th>
+          <th class="col-qty">Quantity</th>
+          <th class="col-price">Price</th>
+          <th class="col-amount divide">Amount</th>
+          <th class="col-del"></th>
+        </tr>
+      </thead>
+      <tbody id="budgetBody"></tbody>
+      <tfoot>
+        <tr class="grand-total-row">
+          <td colspan="4" class="grand-total-label">Grand Total</td>
+          <td class="num divide" id="grandTotal">0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+    <button type="button" class="btn btn-primary btn-sm" id="budgetAddBtn" style="margin-top:14px;">+ Add item</button>
+    <p class="hint">Amount = Quantity × Price, calculated automatically as you type. Autosaves in this browser.</p>
   </section>
 </div>
 
@@ -278,6 +340,7 @@
   var FLEX_KEY = 'weekly-schedule-flex-v1';
   var MEALS_KEY = 'weekly-schedule-meals-v1';
   var LAST_CATEGORY_KEY = 'weekly-schedule-last-category-v1';
+  var BUDGET_KEY = 'weekly-schedule-budget-v1';
 
   function uid(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function toMinutes(t){ var parts = t.split(':'); return Number(parts[0])*60 + Number(parts[1]); }
@@ -320,6 +383,14 @@
     { title:'Studying',   detail:'Mon & Thu — add a time to place it' }
   ];
 
+  var DEFAULT_BUDGET = [
+    { item:'Rent',          qty:1, price:720 },
+    { item:'Internet',      qty:1, price:17 },
+    { item:'Electricity',   qty:1, price:20 },
+    { item:'Food',          qty:1, price:50 },
+    { item:'Miscellaneous', qty:1, price:0 }
+  ];
+
   var DEFAULT_MEALS = [
     { day:0, toMake:1, lunch:'', dinner:'Tofu rice burrito' },
     { day:1, toMake:2, lunch:'Tofu tikki', dinner:'Sandwich (avocado & guac)' },
@@ -352,6 +423,7 @@
   var events = [];
   var flexItems = [];
   var meals = [];
+  var budgetItems = [];
   var editingId = null;
 
   var grid = document.getElementById('grid');
@@ -363,6 +435,8 @@
   var modalTitle = document.getElementById('modalTitle');
   var flexList = document.getElementById('flexList');
   var mealBody = document.getElementById('mealBody');
+  var budgetBody = document.getElementById('budgetBody');
+  var grandTotalEl = document.getElementById('grandTotal');
 
   function storageGet(key){
     try{
@@ -405,11 +479,21 @@
       await storageSet(MEALS_KEY, JSON.stringify(meals));
     }
 
+    var rawBudget = await storageGet(BUDGET_KEY);
+    if(rawBudget){
+      budgetItems = JSON.parse(rawBudget);
+    }else{
+      budgetItems = DEFAULT_BUDGET.map(function(it){ var copy = Object.assign({}, it); copy.id = uid(); return copy; });
+      await storageSet(BUDGET_KEY, JSON.stringify(budgetItems));
+    }
+
     renderGrid();
     renderFlex();
     renderMeals();
+    renderBudget();
     scrollToNow();
     initScrollFade();
+    initTabs();
   }
 
   function scrollToNow(){
@@ -431,6 +515,31 @@
     scroller.addEventListener('scroll', update);
     window.addEventListener('resize', update);
     update();
+  }
+
+  /* ---------- Tabs ---------- */
+
+  function initTabs(){
+    var buttons = document.querySelectorAll('.tab-btn');
+    var panels = {
+      schedule: document.getElementById('tab-schedule'),
+      meals: document.getElementById('tab-meals'),
+      budget: document.getElementById('tab-budget')
+    };
+    function showTab(name){
+      buttons.forEach(function(btn){
+        var active = btn.getAttribute('data-tab') === name;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      Object.keys(panels).forEach(function(key){
+        panels[key].hidden = key !== name;
+      });
+    }
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){ showTab(btn.getAttribute('data-tab')); });
+    });
+    showTab('schedule');
   }
 
   /* ---------- Grid / events ---------- */
@@ -756,10 +865,109 @@
     storageSet(MEALS_KEY, JSON.stringify(meals));
   }
 
+  /* ---------- Budget ---------- */
+
+  function formatMoney(n){
+    return (Number(n) || 0).toFixed(2);
+  }
+
+  function renderBudget(){
+    budgetBody.innerHTML = '';
+    budgetItems.forEach(function(entry, idx){
+      var tr = document.createElement('tr');
+
+      var numTd = document.createElement('td');
+      numTd.className = 'num';
+      numTd.textContent = idx + 1;
+      tr.appendChild(numTd);
+
+      var itemTd = document.createElement('td');
+      var itemInput = document.createElement('input');
+      itemInput.type = 'text';
+      itemInput.value = entry.item || '';
+      itemInput.placeholder = 'Item name';
+      itemInput.addEventListener('change', function(){
+        entry.item = itemInput.value;
+        saveBudget();
+      });
+      itemTd.appendChild(itemInput);
+      tr.appendChild(itemTd);
+
+      var qtyTd = document.createElement('td');
+      var qtyInput = document.createElement('input');
+      qtyInput.type = 'number';
+      qtyInput.min = '0';
+      qtyInput.className = 'qty-input';
+      qtyInput.value = entry.qty;
+      qtyInput.addEventListener('input', function(){
+        entry.qty = Number(qtyInput.value) || 0;
+        amountCell.textContent = formatMoney(entry.qty * entry.price);
+        updateGrandTotal();
+      });
+      qtyInput.addEventListener('change', function(){ saveBudget(); });
+      qtyTd.appendChild(qtyInput);
+      tr.appendChild(qtyTd);
+
+      var priceTd = document.createElement('td');
+      var priceInput = document.createElement('input');
+      priceInput.type = 'number';
+      priceInput.min = '0';
+      priceInput.step = '0.01';
+      priceInput.className = 'qty-input';
+      priceInput.value = entry.price;
+      priceInput.addEventListener('input', function(){
+        entry.price = Number(priceInput.value) || 0;
+        amountCell.textContent = formatMoney(entry.qty * entry.price);
+        updateGrandTotal();
+      });
+      priceInput.addEventListener('change', function(){ saveBudget(); });
+      priceTd.appendChild(priceInput);
+      tr.appendChild(priceTd);
+
+      var amountCell = document.createElement('td');
+      amountCell.className = 'num divide';
+      amountCell.textContent = formatMoney(entry.qty * entry.price);
+      tr.appendChild(amountCell);
+
+      var delTd = document.createElement('td');
+      var delBtn = document.createElement('button');
+      delBtn.className = 'x';
+      delBtn.type = 'button';
+      delBtn.setAttribute('aria-label', 'Remove ' + (entry.item || 'item'));
+      delBtn.textContent = '×';
+      delBtn.addEventListener('click', function(){
+        budgetItems = budgetItems.filter(function(it){ return it.id !== entry.id; });
+        saveBudget();
+        renderBudget();
+      });
+      delTd.appendChild(delBtn);
+      tr.appendChild(delTd);
+
+      budgetBody.appendChild(tr);
+    });
+    updateGrandTotal();
+  }
+
+  function updateGrandTotal(){
+    var total = budgetItems.reduce(function(sum, entry){ return sum + (Number(entry.qty) || 0) * (Number(entry.price) || 0); }, 0);
+    grandTotalEl.textContent = formatMoney(total);
+  }
+
+  function saveBudget(){
+    storageSet(BUDGET_KEY, JSON.stringify(budgetItems));
+    updateGrandTotal();
+  }
+
+  document.getElementById('budgetAddBtn').addEventListener('click', function(){
+    budgetItems.push({ id: uid(), item: '', qty: 1, price: 0 });
+    saveBudget();
+    renderBudget();
+  });
+
   /* ---------- Backup / restore ---------- */
 
   document.getElementById('exportBtn').addEventListener('click', function(){
-    var payload = { events: events, flexItems: flexItems, meals: meals, exportedAt: new Date().toISOString() };
+    var payload = { events: events, flexItems: flexItems, meals: meals, budgetItems: budgetItems, exportedAt: new Date().toISOString() };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -783,16 +991,19 @@
         if(!Array.isArray(data.events) || !Array.isArray(data.flexItems) || !Array.isArray(data.meals)){
           throw new Error('Missing expected fields');
         }
-        if(!confirm('Replace your current schedule, flexible items, and meal plan with this backup?')) return;
+        if(!confirm('Replace your current schedule, flexible items, meal plan, and budget with this backup?')) return;
         events = data.events;
         flexItems = data.flexItems;
         meals = data.meals;
+        budgetItems = Array.isArray(data.budgetItems) ? data.budgetItems : [];
         storageSet(EVENTS_KEY, JSON.stringify(events));
         storageSet(FLEX_KEY, JSON.stringify(flexItems));
         storageSet(MEALS_KEY, JSON.stringify(meals));
+        storageSet(BUDGET_KEY, JSON.stringify(budgetItems));
         renderGrid();
         renderFlex();
         renderMeals();
+        renderBudget();
       }catch(e){
         alert('That file doesn’t look like a valid Sanj’s Planner backup.');
       }
