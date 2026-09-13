@@ -58,8 +58,12 @@
   .btn-danger:hover{ background:#fef2f2; }
   .btn-sm{ padding:6px 12px; font-size:13px; }
 
-  .grid-scroll{ position:relative; overflow-x:auto; border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); margin-top:14px; }
-  .grid{ display:grid; grid-template-columns:52px repeat(7,minmax(108px,1fr)); min-width:820px; }
+  .grid-scroll{ position:relative; overflow-x:auto; overflow-y:hidden; border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); margin-top:14px; scroll-padding-top:2px; }
+  .grid{ display:grid; grid-template-columns:52px repeat(7,minmax(108px,1fr)); min-width:820px; padding-top:2px; }
+  .scroll-fade{ position:absolute; top:0; bottom:0; width:28px; pointer-events:none; opacity:0; transition:opacity 150ms ease-out; z-index:4; }
+  .scroll-fade.left{ left:0; background:linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0)); }
+  .scroll-fade.right{ right:0; background:linear-gradient(to left, rgba(255,255,255,0.95), rgba(255,255,255,0)); }
+  .scroll-fade.show{ opacity:1; }
   .day-head{ position:sticky; top:0; background:var(--color-surface); border-bottom:1px solid var(--color-border); padding:10px 8px; text-align:center; font-weight:700; font-size:13px; z-index:2; }
   .day-head.today{ color:var(--color-accent); }
   .time-col-head{ position:sticky; top:0; left:0; background:var(--color-surface); border-bottom:1px solid var(--color-border); z-index:3; }
@@ -74,8 +78,9 @@
 
   .event{ position:absolute; border-radius:8px; padding:4px 8px; font-size:12px; line-height:1.3; overflow:hidden; cursor:pointer; transition:filter 150ms ease-out; }
   .event:hover{ filter:brightness(0.96); }
+  .event:focus-visible{ outline:2px solid var(--color-accent); outline-offset:2px; filter:brightness(0.96); }
   .event .t{ font-weight:700; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .event .m{ opacity:0.8; display:block; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .event .m{ display:block; font-size:11px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .event.college{ background:var(--college-bg); color:var(--college-text); }
   .event.personal{ background:var(--personal-bg); color:var(--personal-text); }
   .event.other{ background:var(--other-bg); color:var(--other-text); }
@@ -101,15 +106,17 @@
   .error{ color:#dc2626; font-size:12px; margin-top:-6px; margin-bottom:10px; display:none; }
   .error.show{ display:block; }
 
-  .fab{ position:fixed; right:20px; bottom:24px; width:52px; height:52px; border-radius:50%; background:var(--color-accent); color:#fff; font-size:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(79,70,229,0.35); border:none; cursor:pointer; }
-  .fab:hover{ background:var(--color-accent-hover); }
+  .fab{ position:fixed; right:18px; bottom:20px; width:48px; height:48px; border-radius:50%; background:var(--color-accent); color:#fff; font-size:24px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(79,70,229,0.35); border:none; cursor:pointer; opacity:0.92; transition:opacity 150ms ease-out, transform 150ms ease-out, background 150ms ease-out; }
+  .fab:hover, .fab:focus-visible{ background:var(--color-accent-hover); opacity:1; }
+  .fab:active{ transform:scale(0.94); opacity:1; }
+  @media (min-width:641px){ .fab{ display:none; } }
 
   /* Flexible items */
   .flex-list{ border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); overflow:hidden; }
   .flex-row{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--color-border); }
   .flex-row:last-child{ border-bottom:none; }
   .flex-row .ft{ font-weight:700; font-size:14px; width:120px; flex-shrink:0; }
-  .flex-row input[type=text]{ flex:1; border:1px solid transparent; background:transparent; font-size:13px; color:var(--color-text-muted); padding:4px 6px; border-radius:6px; }
+  .flex-row input[type=text]{ flex:1; border:1px solid transparent; background:transparent; font-size:13px; color:var(--color-text-muted); padding:4px 6px; border-radius:6px; text-overflow:ellipsis; }
   .flex-row input[type=text]:focus{ outline:none; border-color:var(--color-border); background:var(--color-bg); color:var(--color-text); }
   .flex-row .x{ background:none; border:none; color:var(--color-text-muted); cursor:pointer; font-size:16px; line-height:1; padding:4px; }
   .flex-row .x:hover{ color:#dc2626; }
@@ -125,8 +132,10 @@
   .meal-table tr:last-child td{ border-bottom:none; }
   .meal-table .day-cell{ font-weight:700; font-size:13px; white-space:nowrap; }
   .meal-table input[type=number]{ width:52px; padding:6px 6px; border:1px solid var(--color-border); border-radius:6px; font-size:13px; text-align:center; }
-  .meal-table input[type=text]{ width:100%; padding:6px 8px; border:1px solid var(--color-border); border-radius:6px; font-size:13px; }
-  .save-note{ font-size:11px; color:var(--color-text-muted); margin-top:8px; }
+  .meal-table input[type=text]{ width:100%; padding:6px 8px; border:1px solid var(--color-border); border-radius:6px; font-size:13px; text-overflow:ellipsis; }
+  .save-note{ font-size:11px; color:var(--color-text-muted); margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .backup-btn{ background:none; border:none; padding:0; color:var(--color-accent); font-size:11px; font-weight:600; cursor:pointer; text-decoration:underline; }
+  .backup-btn:hover{ color:var(--color-accent-hover); }
 
   @media (max-width:480px){
     h1{ font-size:22px; }
@@ -149,16 +158,19 @@
       <span class="legend-item"><span class="dot personal"></span>Personal</span>
       <span class="legend-item"><span class="dot other"></span>Work / other</span>
     </div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn btn-ghost" id="resetBtn">Reset week</button>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <button class="btn btn-ghost" id="resetBtn">Clear schedule</button>
+      <span style="width:1px; height:20px; background:var(--color-border);" aria-hidden="true"></span>
       <button class="btn btn-primary" id="addBtnTop">+ Add block</button>
     </div>
   </div>
-  <p class="hint">Double-click an empty slot to add a block there, or click a block to edit or delete it.</p>
+  <p class="hint">Tap + to add a block, or double-click an empty slot on desktop. Click any block to edit or delete it.</p>
 
-  <div class="grid-scroll">
+  <div class="grid-scroll" id="gridScroll">
     <div class="grid" id="grid"></div>
     <div class="empty-hint" id="emptyHint">Nothing here yet — tap "+ Add block" to start filling in your week.</div>
+    <div class="scroll-fade left" id="fadeLeft"></div>
+    <div class="scroll-fade right" id="fadeRight"></div>
   </div>
 
   <section>
@@ -180,7 +192,12 @@
       </thead>
       <tbody id="mealBody"></tbody>
     </table>
-    <p class="save-note">Autosaves as you edit.</p>
+    <p class="save-note">
+      Autosaves in this browser as you edit — export a backup before clearing site data.
+      <button type="button" class="backup-btn" id="exportBtn">Export backup</button>
+      <button type="button" class="backup-btn" id="importBtn">Import backup</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none;" />
+    </p>
   </section>
 </div>
 
@@ -255,6 +272,7 @@
   var SEEDED_KEY = 'weekly-schedule-seeded-v1';
   var FLEX_KEY = 'weekly-schedule-flex-v1';
   var MEALS_KEY = 'weekly-schedule-meals-v1';
+  var LAST_CATEGORY_KEY = 'weekly-schedule-last-category-v1';
 
   function uid(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function toMinutes(t){ var parts = t.split(':'); return Number(parts[0])*60 + Number(parts[1]); }
@@ -365,6 +383,29 @@
     renderGrid();
     renderFlex();
     renderMeals();
+    scrollToNow();
+    initScrollFade();
+  }
+
+  function scrollToNow(){
+    var nowLine = grid.querySelector('.now-line');
+    if(!nowLine) return;
+    var target = nowLine.getBoundingClientRect().top + window.scrollY - (window.innerHeight * 0.33);
+    window.scrollTo({ top: Math.max(target, 0), behavior: 'auto' });
+  }
+
+  function initScrollFade(){
+    var scroller = document.getElementById('gridScroll');
+    var fadeLeft = document.getElementById('fadeLeft');
+    var fadeRight = document.getElementById('fadeRight');
+    function update(){
+      var maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      fadeLeft.classList.toggle('show', scroller.scrollLeft > 4);
+      fadeRight.classList.toggle('show', scroller.scrollLeft < maxScroll - 4);
+    }
+    scroller.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    update();
   }
 
   /* ---------- Grid / events ---------- */
@@ -386,6 +427,7 @@
       modalTitle.textContent = 'Add time block';
       form.reset();
       document.getElementById('f-day').value = dayIndex != null ? dayIndex : 0;
+      document.getElementById('f-category').value = storageGet(LAST_CATEGORY_KEY) || 'personal';
       document.getElementById('f-start').value = '09:00';
       document.getElementById('f-end').value = '10:00';
       deleteBtn.style.display = 'none';
@@ -426,6 +468,7 @@
       events.push(record);
     }
     storageSet(EVENTS_KEY, JSON.stringify(events));
+    storageSet(LAST_CATEGORY_KEY, category);
     renderGrid();
     closeModal();
   });
@@ -444,7 +487,7 @@
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
 
   document.getElementById('resetBtn').addEventListener('click', function(){
-    if(confirm('Clear every block from this week\u2019s schedule?')){
+    if(confirm('Clear every time block from the grid? Your flexible items and meal plan won\u2019t be touched.')){
       events = [];
       storageSet(EVENTS_KEY, JSON.stringify(events));
       renderGrid();
@@ -554,7 +597,17 @@
           block.style.left = (colIdx*(100/totalCols)) + '%';
           var metaText = ev.start + '\u2013' + ev.end + (ev.loc ? ' \u00b7 ' + ev.loc : '');
           block.innerHTML = '<span class="t">' + escapeHtml(ev.title) + '</span><span class="m">' + escapeHtml(metaText) + '</span>';
+          block.setAttribute('tabindex', '0');
+          block.setAttribute('role', 'button');
+          block.setAttribute('aria-label', ev.title + ', ' + metaText + '. Press Enter to edit or delete.');
           block.addEventListener('click', function(e){ e.stopPropagation(); openModal(d, ev); });
+          block.addEventListener('keydown', function(e){
+            if(e.key === 'Enter' || e.key === ' '){
+              e.preventDefault();
+              e.stopPropagation();
+              openModal(d, ev);
+            }
+          });
           col.appendChild(block);
         });
 
@@ -663,6 +716,51 @@
     if(idx === -1){ meals.push(entry); } else { meals[idx] = entry; }
     storageSet(MEALS_KEY, JSON.stringify(meals));
   }
+
+  /* ---------- Backup / restore ---------- */
+
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    var payload = { events: events, flexItems: flexItems, meals: meals, exportedAt: new Date().toISOString() };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'sanjs-planner-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  var importFile = document.getElementById('importFile');
+  document.getElementById('importBtn').addEventListener('click', function(){ importFile.click(); });
+  importFile.addEventListener('change', function(){
+    var file = importFile.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(!Array.isArray(data.events) || !Array.isArray(data.flexItems) || !Array.isArray(data.meals)){
+          throw new Error('Missing expected fields');
+        }
+        if(!confirm('Replace your current schedule, flexible items, and meal plan with this backup?')) return;
+        events = data.events;
+        flexItems = data.flexItems;
+        meals = data.meals;
+        storageSet(EVENTS_KEY, JSON.stringify(events));
+        storageSet(FLEX_KEY, JSON.stringify(flexItems));
+        storageSet(MEALS_KEY, JSON.stringify(meals));
+        renderGrid();
+        renderFlex();
+        renderMeals();
+      }catch(e){
+        alert('That file doesn’t look like a valid Sanj’s Planner backup.');
+      }
+      importFile.value = '';
+    };
+    reader.readAsText(file);
+  });
 
   loadAll();
 })();
