@@ -42,6 +42,10 @@
     --st-rejected-text: #b91c1c;
     --st-ghosted-bg: #f4f4f5;
     --st-ghosted-text: #52525b;
+    --lunch-bg: #ffedd5;
+    --lunch-text: #c2410c;
+    --dinner-bg: #e0e7ff;
+    --dinner-text: #4338ca;
     --radius: 10px;
   }
   *{ box-sizing:border-box; }
@@ -162,7 +166,19 @@
   .meal-add-btn{ width:26px; height:26px; border-radius:50%; border:1px dashed var(--color-border); background:transparent; color:var(--color-text-muted); font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:border-color 150ms ease-out, color 150ms ease-out, background-color 150ms ease-out, transform 150ms ease-out; }
   .meal-add-btn:hover{ border-color:var(--color-accent); color:var(--color-accent); background:var(--color-bg); }
   .meal-add-btn:active{ transform:scale(0.93); }
+  .meal-add-btn-lunch{ border-color:var(--lunch-text); color:var(--lunch-text); opacity:0.6; }
+  .meal-add-btn-lunch:hover{ border-color:var(--lunch-text); color:var(--lunch-text); background:var(--lunch-bg); opacity:1; }
+  .meal-add-btn-dinner{ border-color:var(--dinner-text); color:var(--dinner-text); opacity:0.6; }
+  .meal-add-btn-dinner:hover{ border-color:var(--dinner-text); color:var(--dinner-text); background:var(--dinner-bg); opacity:1; }
   .meal-chip{ display:inline-flex; align-items:center; gap:4px; max-width:100%; min-width:0; background:var(--color-bg); border:1px solid var(--color-border); border-radius:999px; padding:4px 4px 4px 12px; font-size:13px; }
+  .meal-chip-lunch{ background:var(--lunch-bg); border-color:var(--lunch-bg); }
+  .meal-chip-lunch .meal-chip-text{ color:var(--lunch-text); font-weight:600; }
+  .meal-chip-lunch .x{ color:var(--lunch-text); opacity:0.65; }
+  .meal-chip-lunch .x:hover{ color:#dc2626; opacity:1; }
+  .meal-chip-dinner{ background:var(--dinner-bg); border-color:var(--dinner-bg); }
+  .meal-chip-dinner .meal-chip-text{ color:var(--dinner-text); font-weight:600; }
+  .meal-chip-dinner .x{ color:var(--dinner-text); opacity:0.65; }
+  .meal-chip-dinner .x:hover{ color:#dc2626; opacity:1; }
   .meal-chip-text{ cursor:text; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; max-width:160px; }
   .meal-chip .x{ padding:3px; font-size:14px; flex-shrink:0; }
   .save-note{ font-size:11px; color:var(--color-text-muted); margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -253,8 +269,11 @@
   .home-greeting h2{ font-size:22px; margin:0 0 4px; }
 
   .week-strip{ display:flex; gap:6px; margin:18px 0 20px; }
-  .week-pill{ flex:1; text-align:center; padding:10px 4px; border-radius:10px; background:var(--color-surface); border:1px solid var(--color-border); font-size:12px; font-weight:700; color:var(--color-text-muted); transition:background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out; }
-  .week-pill.today{ background:var(--color-accent); border-color:var(--color-accent); color:#fff; }
+  .week-pill{ flex:1; text-align:center; padding:10px 4px; border-radius:10px; background:var(--color-surface); border:1px solid var(--color-border); font-size:12px; font-weight:700; color:var(--color-text-muted); cursor:pointer; transition:background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out; }
+  .week-pill:hover{ color:var(--color-text); }
+  .week-pill:active{ transform:scale(0.96); }
+  .week-pill.today:not(.selected){ border-color:var(--color-accent); color:var(--color-accent); }
+  .week-pill.selected{ background:var(--color-accent); border-color:var(--color-accent); color:#fff; }
 
   .home-grid{ display:grid; grid-template-columns:1.6fr 1fr; gap:20px; align-items:start; }
   .home-section-head{ margin-bottom:12px; }
@@ -311,9 +330,13 @@
   .mini-cal-nav-btn svg{ width:14px; height:14px; }
   .mini-cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
   .mini-cal-dow{ text-align:center; font-size:10px; font-weight:700; color:var(--color-text-muted); padding-bottom:6px; }
-  .mini-cal-day{ text-align:center; font-size:12px; padding:6px 0; border-radius:8px; color:var(--color-text); }
+  .mini-cal-day{ text-align:center; font-size:12px; padding:6px 0; border-radius:8px; color:var(--color-text); border:none; background:none; font-family:inherit; }
   .mini-cal-day.other-month{ color:var(--color-text-muted); opacity:0.35; }
-  .mini-cal-day.today{ background:var(--color-accent); color:#fff; font-weight:800; }
+  .mini-cal-day.in-month{ cursor:pointer; transition:background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out; }
+  .mini-cal-day.in-month:hover{ background:var(--color-bg); }
+  .mini-cal-day.in-month:active{ transform:scale(0.9); }
+  .mini-cal-day.today:not(.selected){ box-shadow:inset 0 0 0 1.5px var(--color-accent); color:var(--color-accent); font-weight:800; }
+  .mini-cal-day.selected, .mini-cal-day.selected:hover{ background:var(--color-accent); color:#fff; font-weight:800; }
 
   @media (max-width:760px){
     .home-grid{ grid-template-columns:1fr; }
@@ -380,7 +403,7 @@
     <div class="home-grid">
       <div class="home-main">
         <div class="home-section-head">
-          <h2>Up next today</h2>
+          <h2 id="homeUpcomingHeading">Up next today</h2>
         </div>
         <div class="home-upcoming-list" id="homeUpcomingList"></div>
       </div>
@@ -1303,14 +1326,14 @@
     if(!value){
       var addBtn = document.createElement('button');
       addBtn.type = 'button';
-      addBtn.className = 'meal-add-btn';
+      addBtn.className = 'meal-add-btn meal-add-btn-' + field;
       addBtn.setAttribute('aria-label', 'Add ' + placeholder.toLowerCase());
       addBtn.textContent = '+';
       addBtn.addEventListener('click', renderEditing);
       container.appendChild(addBtn);
     }else{
       var chip = document.createElement('div');
-      chip.className = 'meal-chip';
+      chip.className = 'meal-chip meal-chip-' + field;
 
       var text = document.createElement('span');
       text.className = 'meal-chip-text';
@@ -1834,12 +1857,34 @@
 
   var CATEGORY_LABEL = { college:'College', personal:'Personal', other:'Work / other' };
 
+  var selectedDayIndex = getTodayIndex();
+  var selectedCalDate = null;
+
   function renderHomeGreeting(){
     var now = new Date();
     var hour = now.getHours();
     var greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     document.getElementById('homeGreeting').textContent = greeting + ', Sanj \u{1F44B}';
-    document.getElementById('homeSubtitle').textContent = DAY_NAMES_FULL[getTodayIndex()] + '’s plan at a glance.';
+    document.getElementById('homeSubtitle').textContent = DAY_NAMES_FULL[selectedDayIndex] + '’s plan at a glance.';
+  }
+
+  function selectDay(dayIndex){
+    selectedDayIndex = dayIndex;
+    selectedCalDate = null;
+    renderWeekStrip();
+    renderHomeGreeting();
+    renderHomeUpcoming();
+    renderMiniCal();
+  }
+
+  function selectCalendarDate(year, month, dayNum){
+    var weekday = (new Date(year, month, dayNum).getDay() + 6) % 7;
+    selectedDayIndex = weekday;
+    selectedCalDate = { y: year, m: month, d: dayNum };
+    renderWeekStrip();
+    renderHomeGreeting();
+    renderHomeUpcoming();
+    renderMiniCal();
   }
 
   function renderWeekStrip(){
@@ -1847,43 +1892,51 @@
     stripEl.innerHTML = '';
     var todayIndex = getTodayIndex();
     DAY_NAMES.forEach(function(name, i){
-      var pill = document.createElement('div');
-      pill.className = 'week-pill' + (i === todayIndex ? ' today' : '');
+      var pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'week-pill' + (i === todayIndex ? ' today' : '') + (i === selectedDayIndex ? ' selected' : '');
       pill.textContent = name;
+      pill.addEventListener('click', function(){ selectDay(i); });
       stripEl.appendChild(pill);
     });
   }
 
-  function getTodayUpcomingEvents(){
-    var todayIndex = getTodayIndex();
-    var now = new Date();
-    var nowMin = now.getHours() * 60 + now.getMinutes();
-    return events
-      .filter(function(ev){ return ev.day === todayIndex && toMinutes(ev.end) > nowMin; })
-      .sort(function(a, b){ return toMinutes(a.start) - toMinutes(b.start); });
+  function getDayEvents(dayIndex, upcomingOnly){
+    var result = events.filter(function(ev){ return ev.day === dayIndex; });
+    if(upcomingOnly){
+      var now = new Date();
+      var nowMin = now.getHours() * 60 + now.getMinutes();
+      result = result.filter(function(ev){ return toMinutes(ev.end) > nowMin; });
+    }
+    return result.sort(function(a, b){ return toMinutes(a.start) - toMinutes(b.start); });
   }
 
   function renderHomeUpcoming(){
+    var isToday = selectedDayIndex === getTodayIndex();
+    document.getElementById('homeUpcomingHeading').textContent = isToday ? 'Up next today' : DAY_NAMES_FULL[selectedDayIndex];
+
     var listEl = document.getElementById('homeUpcomingList');
     listEl.innerHTML = '';
-    var todays = getTodayUpcomingEvents();
-    if(todays.length === 0){
+    var dayEvents = getDayEvents(selectedDayIndex, isToday);
+    if(dayEvents.length === 0){
       var empty = document.createElement('div');
       empty.className = 'app-empty';
-      empty.textContent = 'Nothing left on today’s schedule — enjoy the rest of your day.';
+      empty.textContent = isToday
+        ? 'Nothing left on today’s schedule — enjoy the rest of your day.'
+        : 'Nothing scheduled for ' + DAY_NAMES_FULL[selectedDayIndex] + '.';
       listEl.appendChild(empty);
       return;
     }
-    todays.forEach(function(ev, idx){
+    dayEvents.forEach(function(ev, idx){
       var card = document.createElement('div');
-      card.className = 'home-upcoming-card ' + ev.category + (idx === 0 ? ' next-up' : '');
+      card.className = 'home-upcoming-card ' + ev.category + (isToday && idx === 0 ? ' next-up' : '');
       card.style.animationDelay = (idx * 50) + 'ms';
 
       var head = document.createElement('div');
       head.className = 'home-upcoming-head';
       var badge = document.createElement('span');
       badge.className = 'home-upcoming-badge';
-      badge.textContent = idx === 0 ? 'Next up' : CATEGORY_LABEL[ev.category];
+      badge.textContent = (isToday && idx === 0) ? 'Next up' : CATEGORY_LABEL[ev.category];
       var time = document.createElement('span');
       time.className = 'home-upcoming-time';
       time.textContent = ev.start + '–' + ev.end;
@@ -2001,7 +2054,9 @@
     var isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
 
     for(var i = 0; i < totalCells; i++){
-      var cell = document.createElement('div');
+      var inMonth = i >= startOffset && i < startOffset + daysInMonth;
+      var cell = document.createElement(inMonth ? 'button' : 'div');
+      if(inMonth) cell.type = 'button';
       cell.className = 'mini-cal-day';
       var dayNum;
       if(i < startOffset){
@@ -2012,7 +2067,14 @@
         cell.classList.add('other-month');
       }else{
         dayNum = i - startOffset + 1;
+        cell.classList.add('in-month');
         if(isCurrentMonth && dayNum === today.getDate()) cell.classList.add('today');
+        if(selectedCalDate && selectedCalDate.y === year && selectedCalDate.m === month && selectedCalDate.d === dayNum){
+          cell.classList.add('selected');
+        }
+        (function(y, m, d){
+          cell.addEventListener('click', function(){ selectCalendarDate(y, m, d); });
+        })(year, month, dayNum);
       }
       cell.textContent = dayNum;
       gridEl.appendChild(cell);
