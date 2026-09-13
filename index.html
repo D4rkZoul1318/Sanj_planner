@@ -135,6 +135,7 @@
   .meal-table td{ padding:8px 12px; border-bottom:1px solid var(--color-border); vertical-align:middle; }
   .meal-table tr:last-child td{ border-bottom:none; }
   .meal-table .day-cell{ font-weight:700; font-size:13px; white-space:nowrap; }
+  .meal-table .divide{ border-left:1px solid var(--color-border); }
   .meal-table input[type=number]{ width:52px; padding:6px 6px; border:1px solid var(--color-border); border-radius:6px; font-size:13px; text-align:center; }
   .meal-table input[type=text]{ width:100%; padding:6px 8px; border:1px solid var(--color-border); border-radius:6px; font-size:13px; text-overflow:ellipsis; }
   .save-note{ font-size:11px; color:var(--color-text-muted); margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -192,7 +193,7 @@
     <h2>This week's meals</h2>
     <table class="meal-table" id="mealTable">
       <thead>
-        <tr><th>Day</th><th style="width:90px;">To make</th><th>Meals</th></tr>
+        <tr><th>Day</th><th style="width:90px;">To make</th><th>Lunch</th><th class="divide">Dinner</th></tr>
       </thead>
       <tbody id="mealBody"></tbody>
     </table>
@@ -320,14 +321,33 @@
   ];
 
   var DEFAULT_MEALS = [
-    { day:0, toMake:1, notes:'Tofu rice burrito' },
-    { day:1, toMake:2, notes:'Lunch: Tofu tikki · Dinner: Sandwich (avocado & guac)' },
-    { day:2, toMake:0, notes:'N/A' },
-    { day:3, toMake:1, notes:'Dinner: Cottage cheese bhurji' },
-    { day:4, toMake:0, notes:'N/A' },
-    { day:5, toMake:0, notes:'' },
-    { day:6, toMake:0, notes:'' }
+    { day:0, toMake:1, lunch:'', dinner:'Tofu rice burrito' },
+    { day:1, toMake:2, lunch:'Tofu tikki', dinner:'Sandwich (avocado & guac)' },
+    { day:2, toMake:0, lunch:'', dinner:'' },
+    { day:3, toMake:1, lunch:'', dinner:'Cottage cheese bhurji' },
+    { day:4, toMake:0, lunch:'', dinner:'' },
+    { day:5, toMake:0, lunch:'', dinner:'' },
+    { day:6, toMake:0, lunch:'', dinner:'' }
   ];
+
+  function migrateMealNotes(entry){
+    if(entry.lunch != null || entry.dinner != null) return entry;
+    var notes = entry.notes || '';
+    var lunchMatch = notes.match(/Lunch:\s*([^·]*)/i);
+    var dinnerMatch = notes.match(/Dinner:\s*(.*)/i);
+    if(lunchMatch || dinnerMatch){
+      entry.lunch = lunchMatch ? lunchMatch[1].trim() : '';
+      entry.dinner = dinnerMatch ? dinnerMatch[1].trim() : '';
+    }else if(notes === 'N/A' || !notes){
+      entry.lunch = '';
+      entry.dinner = '';
+    }else{
+      entry.lunch = '';
+      entry.dinner = notes;
+    }
+    delete entry.notes;
+    return entry;
+  }
 
   var events = [];
   var flexItems = [];
@@ -378,7 +398,8 @@
 
     var rawMeals = await storageGet(MEALS_KEY);
     if(rawMeals){
-      meals = JSON.parse(rawMeals);
+      meals = JSON.parse(rawMeals).map(migrateMealNotes);
+      await storageSet(MEALS_KEY, JSON.stringify(meals));
     }else{
       meals = DEFAULT_MEALS.slice();
       await storageSet(MEALS_KEY, JSON.stringify(meals));
@@ -679,7 +700,7 @@
     mealBody.innerHTML = '';
     for(var d=0; d<7; d++){
       (function(d){
-        var entry = meals.find(function(m){ return m.day === d; }) || { day:d, toMake:0, notes:'' };
+        var entry = meals.find(function(m){ return m.day === d; }) || { day:d, toMake:0, lunch:'', dinner:'' };
         var tr = document.createElement('tr');
 
         var dayTd = document.createElement('td');
@@ -699,17 +720,30 @@
         makeTd.appendChild(makeInput);
         tr.appendChild(makeTd);
 
-        var notesTd = document.createElement('td');
-        var notesInput = document.createElement('input');
-        notesInput.type = 'text';
-        notesInput.value = entry.notes || '';
-        notesInput.placeholder = 'What\u2019s cooking';
-        notesInput.addEventListener('change', function(){
-          entry.notes = notesInput.value;
+        var lunchTd = document.createElement('td');
+        var lunchInput = document.createElement('input');
+        lunchInput.type = 'text';
+        lunchInput.value = entry.lunch || '';
+        lunchInput.placeholder = 'What\u2019s for lunch';
+        lunchInput.addEventListener('change', function(){
+          entry.lunch = lunchInput.value;
           saveMeals(entry);
         });
-        notesTd.appendChild(notesInput);
-        tr.appendChild(notesTd);
+        lunchTd.appendChild(lunchInput);
+        tr.appendChild(lunchTd);
+
+        var dinnerTd = document.createElement('td');
+        dinnerTd.className = 'divide';
+        var dinnerInput = document.createElement('input');
+        dinnerInput.type = 'text';
+        dinnerInput.value = entry.dinner || '';
+        dinnerInput.placeholder = 'What\u2019s for dinner';
+        dinnerInput.addEventListener('change', function(){
+          entry.dinner = dinnerInput.value;
+          saveMeals(entry);
+        });
+        dinnerTd.appendChild(dinnerInput);
+        tr.appendChild(dinnerTd);
 
         mealBody.appendChild(tr);
       })(d);
