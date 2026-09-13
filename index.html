@@ -716,9 +716,24 @@
     'Offer':'offer', 'Rejected':'rejected', 'Ghosted':'ghosted'
   };
 
+  var BOSTON_TZ = 'America/New_York';
+  function bostonNow(){
+    var parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: BOSTON_TZ,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false
+    }).formatToParts(new Date());
+    var map = {};
+    parts.forEach(function(p){ map[p.type] = p.value; });
+    var hour = Number(map.hour);
+    if(hour === 24) hour = 0;
+    return new Date(Number(map.year), Number(map.month) - 1, Number(map.day), hour, Number(map.minute), Number(map.second));
+  }
+
   function uid(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function toMinutes(t){ var parts = t.split(':'); return Number(parts[0])*60 + Number(parts[1]); }
-  function getTodayIndex(){ var d = new Date().getDay(); return d === 0 ? 6 : d - 1; }
+  function getTodayIndex(){ var d = bostonNow().getDay(); return d === 0 ? 6 : d - 1; }
   function escapeHtml(str){
     var div = document.createElement('div');
     div.textContent = str == null ? '' : str;
@@ -1114,7 +1129,7 @@
     timeHead.className = 'time-col-head';
     grid.appendChild(timeHead);
 
-    var today = new Date();
+    var today = bostonNow();
     var jsDay = today.getDay();
     var todayIndex = jsDay === 0 ? 6 : jsDay - 1;
 
@@ -1651,7 +1666,7 @@
   }
 
   function appTodayIso(){
-    var d = new Date();
+    var d = bostonNow();
     var m = String(d.getMonth()+1).padStart(2,'0');
     var day = String(d.getDate()).padStart(2,'0');
     return d.getFullYear()+'-'+m+'-'+day;
@@ -1861,7 +1876,7 @@
   var selectedCalDate = null;
 
   function renderHomeGreeting(){
-    var now = new Date();
+    var now = bostonNow();
     var hour = now.getHours();
     var greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     document.getElementById('homeGreeting').textContent = greeting + ', Sanj \u{1F44B}';
@@ -1904,7 +1919,7 @@
   function getDayEvents(dayIndex, upcomingOnly){
     var result = events.filter(function(ev){ return ev.day === dayIndex; });
     if(upcomingOnly){
-      var now = new Date();
+      var now = bostonNow();
       var nowMin = now.getHours() * 60 + now.getMinutes();
       result = result.filter(function(ev){ return toMinutes(ev.end) > nowMin; });
     }
@@ -2027,7 +2042,7 @@
   }
 
   var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var miniCalMonth = new Date();
+  var miniCalMonth = bostonNow();
   miniCalMonth.setDate(1);
   miniCalMonth.setHours(0, 0, 0, 0);
 
@@ -2050,7 +2065,7 @@
     var daysInPrevMonth = new Date(year, month, 0).getDate();
     var totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
 
-    var today = new Date();
+    var today = bostonNow();
     var isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
 
     for(var i = 0; i < totalCells; i++){
