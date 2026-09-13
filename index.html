@@ -303,6 +303,18 @@
   .home-card-link:active{ transform:translateY(0) scale(0.98); }
   .home-card-link:focus-visible{ outline:2px solid var(--color-accent); outline-offset:2px; }
 
+  .mini-cal-head{ display:flex; align-items:center; margin-bottom:10px; }
+  .mini-cal-title{ flex:1; text-align:center; font-weight:700; font-size:13px; }
+  .mini-cal-nav-btn{ width:24px; height:24px; padding:0; border-radius:7px; border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 120ms ease-out, background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out; }
+  .mini-cal-nav-btn:hover{ background:var(--color-bg); border-color:var(--color-accent); color:var(--color-accent); }
+  .mini-cal-nav-btn:active{ transform:scale(0.9); }
+  .mini-cal-nav-btn svg{ width:14px; height:14px; }
+  .mini-cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .mini-cal-dow{ text-align:center; font-size:10px; font-weight:700; color:var(--color-text-muted); padding-bottom:6px; }
+  .mini-cal-day{ text-align:center; font-size:12px; padding:6px 0; border-radius:8px; color:var(--color-text); }
+  .mini-cal-day.other-month{ color:var(--color-text-muted); opacity:0.35; }
+  .mini-cal-day.today{ background:var(--color-accent); color:#fff; font-weight:800; }
+
   @media (max-width:760px){
     .home-grid{ grid-template-columns:1fr; }
   }
@@ -387,6 +399,18 @@
           <div class="home-card-label">Next follow-up</div>
           <div class="home-card-value" id="homeAppVal">No follow-ups scheduled</div>
           <div class="home-card-sub" id="homeAppSub"></div>
+        </div>
+        <div class="home-card" id="homeCalendarCard">
+          <div class="mini-cal-head">
+            <button type="button" class="mini-cal-nav-btn" id="miniCalPrev" aria-label="Previous month">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="mini-cal-title" id="miniCalTitle"></div>
+            <button type="button" class="mini-cal-nav-btn" id="miniCalNext" aria-label="Next month">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+          <div class="mini-cal-grid" id="miniCalGrid"></div>
         </div>
       </div>
     </div>
@@ -1949,6 +1973,61 @@
     });
   }
 
+  var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var miniCalMonth = new Date();
+  miniCalMonth.setDate(1);
+  miniCalMonth.setHours(0, 0, 0, 0);
+
+  function renderMiniCal(){
+    document.getElementById('miniCalTitle').textContent = MONTH_NAMES[miniCalMonth.getMonth()] + ' ' + miniCalMonth.getFullYear();
+
+    var gridEl = document.getElementById('miniCalGrid');
+    gridEl.innerHTML = '';
+    DAY_NAMES.forEach(function(d){
+      var dow = document.createElement('div');
+      dow.className = 'mini-cal-dow';
+      dow.textContent = d.charAt(0);
+      gridEl.appendChild(dow);
+    });
+
+    var year = miniCalMonth.getFullYear();
+    var month = miniCalMonth.getMonth();
+    var startOffset = (new Date(year, month, 1).getDay() + 6) % 7;
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var daysInPrevMonth = new Date(year, month, 0).getDate();
+    var totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+    var today = new Date();
+    var isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+    for(var i = 0; i < totalCells; i++){
+      var cell = document.createElement('div');
+      cell.className = 'mini-cal-day';
+      var dayNum;
+      if(i < startOffset){
+        dayNum = daysInPrevMonth - startOffset + i + 1;
+        cell.classList.add('other-month');
+      }else if(i >= startOffset + daysInMonth){
+        dayNum = i - startOffset - daysInMonth + 1;
+        cell.classList.add('other-month');
+      }else{
+        dayNum = i - startOffset + 1;
+        if(isCurrentMonth && dayNum === today.getDate()) cell.classList.add('today');
+      }
+      cell.textContent = dayNum;
+      gridEl.appendChild(cell);
+    }
+  }
+
+  document.getElementById('miniCalPrev').addEventListener('click', function(){
+    miniCalMonth.setMonth(miniCalMonth.getMonth() - 1);
+    renderMiniCal();
+  });
+  document.getElementById('miniCalNext').addEventListener('click', function(){
+    miniCalMonth.setMonth(miniCalMonth.getMonth() + 1);
+    renderMiniCal();
+  });
+
   function renderHome(){
     renderHomeGreeting();
     renderWeekStrip();
@@ -1956,6 +2035,7 @@
     renderHomeMealsCard();
     renderHomeBudgetCard();
     renderHomeAppsCard();
+    renderMiniCal();
   }
 
   /* ---------- Backup / restore ---------- */
