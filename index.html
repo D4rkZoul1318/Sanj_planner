@@ -365,6 +365,25 @@
   </div>
 </div>
 
+<div class="overlay" id="budgetNameOverlay">
+  <div class="modal">
+    <h2>Name this budget</h2>
+    <form id="budgetNameForm">
+      <div class="field">
+        <label for="f-budget-name">Budget name</label>
+        <input type="text" id="f-budget-name" placeholder="e.g. Trip to Goa, Q1 Savings" />
+      </div>
+      <p class="error" id="budgetNameError"></p>
+      <div class="modal-actions">
+        <div style="display:flex; gap:8px; margin-left:auto;">
+          <button type="button" class="btn btn-ghost" id="budgetNameCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 (function(){
   var START_HOUR = 5;
@@ -708,7 +727,11 @@
   document.getElementById('addBtnTop').addEventListener('click', function(){ openModal(0, null); });
   document.getElementById('fab').addEventListener('click', function(){ openModal(0, null); });
   overlay.addEventListener('click', function(e){ if(e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    closeModal();
+    closeBudgetNameModal();
+  });
 
   document.getElementById('resetBtn').addEventListener('click', function(){
     if(confirm('Clear every time block from the grid? Your flexible items and meal plan won\u2019t be touched.')){
@@ -1048,17 +1071,7 @@
     addBtn.className = 'budget-pill-add';
     addBtn.setAttribute('aria-label', 'Add budget');
     addBtn.textContent = '+';
-    addBtn.addEventListener('click', function(){
-      var name = prompt('Name this budget (e.g. "Trip to Goa", "Q1 Savings")');
-      if(!name || !name.trim()) return;
-      var newBudget = { id: uid(), name: name.trim(), categories: [] };
-      budgets.push(newBudget);
-      activeBudgetId = newBudget.id;
-      saveBudgets();
-      storageSet(ACTIVE_BUDGET_KEY, activeBudgetId);
-      renderBudgetSwitcher();
-      renderBudget();
-    });
+    addBtn.addEventListener('click', openBudgetNameModal);
     switcher.appendChild(addBtn);
 
     if(budgets.length > 1){
@@ -1081,6 +1094,43 @@
       switcher.appendChild(delBtn);
     }
   }
+
+  var budgetNameOverlay = document.getElementById('budgetNameOverlay');
+  var budgetNameForm = document.getElementById('budgetNameForm');
+  var budgetNameInput = document.getElementById('f-budget-name');
+  var budgetNameError = document.getElementById('budgetNameError');
+
+  function openBudgetNameModal(){
+    budgetNameForm.reset();
+    budgetNameError.classList.remove('show');
+    budgetNameOverlay.classList.add('open');
+    setTimeout(function(){ budgetNameInput.focus(); }, 50);
+  }
+
+  function closeBudgetNameModal(){
+    budgetNameOverlay.classList.remove('open');
+  }
+
+  budgetNameForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = budgetNameInput.value.trim();
+    if(!name){
+      budgetNameError.textContent = 'Give this budget a name.';
+      budgetNameError.classList.add('show');
+      return;
+    }
+    var newBudget = { id: uid(), name: name, categories: [] };
+    budgets.push(newBudget);
+    activeBudgetId = newBudget.id;
+    saveBudgets();
+    storageSet(ACTIVE_BUDGET_KEY, activeBudgetId);
+    renderBudgetSwitcher();
+    renderBudget();
+    closeBudgetNameModal();
+  });
+
+  document.getElementById('budgetNameCancelBtn').addEventListener('click', closeBudgetNameModal);
+  budgetNameOverlay.addEventListener('click', function(e){ if(e.target === budgetNameOverlay) closeBudgetNameModal(); });
 
   function buildBudgetItemRow(cat, entry, num){
     var tr = document.createElement('tr');
