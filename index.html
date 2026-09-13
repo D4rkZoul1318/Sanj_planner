@@ -295,6 +295,13 @@
   .home-card-row{ display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:4px 0; gap:8px; }
   .home-card-row span{ color:var(--color-text-muted); flex-shrink:0; }
   .home-card-row b{ font-weight:700; max-width:65%; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .home-meal-slot{ display:flex; justify-content:flex-end; min-width:0; }
+  .home-meal-slot .meal-chip-text{ max-width:130px; }
+
+  .home-card-link{ cursor:pointer; transition:transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out; }
+  .home-card-link:hover{ transform:translateY(-1px); box-shadow:0 4px 10px rgba(24,24,27,0.10); border-color:var(--color-accent); }
+  .home-card-link:active{ transform:translateY(0) scale(0.98); }
+  .home-card-link:focus-visible{ outline:2px solid var(--color-accent); outline-offset:2px; }
 
   @media (max-width:760px){
     .home-grid{ grid-template-columns:1fr; }
@@ -352,7 +359,7 @@
 
   <section id="tab-home" class="tab-panel" role="tabpanel">
     <div class="home-greeting">
-      <h2 id="homeGreeting">Good morning 👋</h2>
+      <h2 id="homeGreeting">Good morning, Sanj 👋</h2>
       <p class="sub" id="homeSubtitle">Here's your day at a glance.</p>
     </div>
 
@@ -368,15 +375,15 @@
       <div class="home-side">
         <div class="home-card">
           <div class="home-card-label">Today's meals</div>
-          <div class="home-card-row"><span>Lunch</span><b id="homeLunchVal">—</b></div>
-          <div class="home-card-row"><span>Dinner</span><b id="homeDinnerVal">—</b></div>
+          <div class="home-card-row"><span>Lunch</span><div class="home-meal-slot" id="homeLunchSlot"></div></div>
+          <div class="home-card-row"><span>Dinner</span><div class="home-meal-slot" id="homeDinnerSlot"></div></div>
         </div>
-        <div class="home-card">
+        <div class="home-card home-card-link" id="homeBudgetCard" role="button" tabindex="0">
           <div class="home-card-label" id="homeBudgetLabel">Budget</div>
           <div class="home-card-value" id="homeBudgetVal">$0.00</div>
           <div class="home-card-sub" id="homeBudgetSub"></div>
         </div>
-        <div class="home-card">
+        <div class="home-card home-card-link" id="homeAppCard" role="button" tabindex="0">
           <div class="home-card-label">Next follow-up</div>
           <div class="home-card-value" id="homeAppVal">No follow-ups scheduled</div>
           <div class="home-card-sub" id="homeAppSub"></div>
@@ -928,6 +935,7 @@
       });
       if(name === 'home') renderHome();
       if(name === 'schedule') scrollToNow();
+      if(name === 'meals') renderMeals();
     }
     buttons.forEach(function(btn){
       btn.addEventListener('click', function(){ showTab(btn.getAttribute('data-tab')); });
@@ -1806,7 +1814,7 @@
     var now = new Date();
     var hour = now.getHours();
     var greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    document.getElementById('homeGreeting').textContent = greeting + ' \u{1F44B}';
+    document.getElementById('homeGreeting').textContent = greeting + ', Sanj \u{1F44B}';
     document.getElementById('homeSubtitle').textContent = DAY_NAMES_FULL[getTodayIndex()] + '’s plan at a glance.';
   }
 
@@ -1877,9 +1885,22 @@
   }
 
   function renderHomeMealsCard(){
-    var entry = meals.find(function(m){ return m.day === getTodayIndex(); }) || {};
-    document.getElementById('homeLunchVal').textContent = entry.lunch || '—';
-    document.getElementById('homeDinnerVal').textContent = entry.dinner || '—';
+    var todayIndex = getTodayIndex();
+    var entry = meals.find(function(m){ return m.day === todayIndex; }) || { day: todayIndex, toMake: 0, lunch: '', dinner: '' };
+    buildMealSlot(document.getElementById('homeLunchSlot'), entry, 'lunch', 'What’s for lunch');
+    buildMealSlot(document.getElementById('homeDinnerSlot'), entry, 'dinner', 'What’s for dinner');
+  }
+
+  function goToTab(name){
+    var btn = document.getElementById('tabBtn' + name.charAt(0).toUpperCase() + name.slice(1));
+    if(btn) btn.click();
+  }
+
+  function bindCardActivation(cardEl, handler){
+    cardEl.onclick = handler;
+    cardEl.onkeydown = function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); handler(); }
+    };
   }
 
   function renderHomeBudgetCard(){
@@ -1891,12 +1912,13 @@
       labelEl.textContent = 'Budget';
       valEl.textContent = '$0.00';
       subEl.textContent = 'No budget yet';
-      return;
+    }else{
+      var total = active.categories.reduce(function(sum, cat){ return sum + categoryTotal(cat); }, 0);
+      labelEl.textContent = active.name || 'Budget';
+      valEl.textContent = '$' + formatMoney(total);
+      subEl.textContent = active.categories.length + ' categor' + (active.categories.length === 1 ? 'y' : 'ies');
     }
-    var total = active.categories.reduce(function(sum, cat){ return sum + categoryTotal(cat); }, 0);
-    labelEl.textContent = active.name || 'Budget';
-    valEl.textContent = '$' + formatMoney(total);
-    subEl.textContent = active.categories.length + ' categor' + (active.categories.length === 1 ? 'y' : 'ies');
+    bindCardActivation(document.getElementById('homeBudgetCard'), function(){ goToTab('budget'); });
   }
 
   function renderHomeAppsCard(){
@@ -1911,14 +1933,20 @@
     var pick = upcoming[0] || overdue[0];
     var valEl = document.getElementById('homeAppVal');
     var subEl = document.getElementById('homeAppSub');
+    var cardEl = document.getElementById('homeAppCard');
     if(!pick){
       valEl.textContent = 'No follow-ups scheduled';
       subEl.textContent = '';
+      bindCardActivation(cardEl, function(){ goToTab('applications'); });
       return;
     }
     valEl.textContent = pick.company + ' — ' + pick.role;
     var isOverdue = pick.followUpDate < todayIso;
     subEl.textContent = (isOverdue ? 'Overdue since ' : 'Follow up by ') + formatAppDate(pick.followUpDate);
+    bindCardActivation(cardEl, function(){
+      goToTab('applications');
+      openAppModal(pick);
+    });
   }
 
   function renderHome(){
