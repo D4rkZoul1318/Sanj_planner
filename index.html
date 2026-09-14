@@ -46,6 +46,14 @@
     --lunch-text: #c2410c;
     --dinner-bg: #e0e7ff;
     --dinner-text: #4338ca;
+    --acc-shift-bg: #eff6ff;
+    --acc-shift: #2563eb;
+    --acc-schedule-bg: #f5f3ff;
+    --acc-schedule: #7c3aed;
+    --acc-budget-bg: #fffbeb;
+    --acc-budget: #d97706;
+    --acc-apps-bg: #ecfdf5;
+    --acc-apps: #059669;
     --radius: 10px;
   }
   *{ box-sizing:border-box; }
@@ -302,28 +310,6 @@
   .shift-entry-times .shift-time-sep{ font-size:11px; color:var(--color-text-muted); flex-shrink:0; }
   .shift-add-entry-btn{ margin-top:4px; }
 
-  .shifts-dashboard{ margin-top:22px; }
-  .shifts-table td, .shifts-table th{ vertical-align:middle; }
-  .shifts-table .day-cell{ font-weight:700; font-size:13px; white-space:nowrap; }
-  .shifts-table tr.today-row{ background:var(--color-bg); }
-  .shifts-table tr.today-row .day-cell{ color:var(--color-accent); }
-  .shifts-entries-cell{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
-  .shift-off-label{ color:var(--color-text-muted); font-size:13px; font-style:italic; }
-  .shift-chip{ display:inline-flex; align-items:center; gap:4px; max-width:100%; min-width:0; background:var(--color-bg); border:1px solid var(--color-border); border-radius:999px; padding:4px 4px 4px 12px; font-size:13px; }
-  .shift-chip-text{ cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; max-width:260px; color:var(--color-text); font-weight:600; background:none; border:none; padding:0; font-family:inherit; }
-  .shift-chip-text:hover{ color:var(--color-accent); }
-  .shift-chip .x{ padding:3px; font-size:14px; flex-shrink:0; }
-  .shift-inline-edit{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; background:var(--color-bg); border:1px solid var(--color-border); border-radius:8px; padding:6px 8px; }
-  .shift-inline-edit input[type=text]{ padding:5px 7px; border:1px solid var(--color-border); border-radius:6px; font-size:12px; min-width:110px; flex:1; background:var(--color-surface); }
-  .shift-inline-edit input[type=time]{ padding:5px 4px; border:1px solid var(--color-border); border-radius:6px; font-size:12px; background:var(--color-surface); }
-  .shift-inline-edit .shift-time-sep{ font-size:11px; color:var(--color-text-muted); flex-shrink:0; }
-  .shift-inline-edit .x{ padding:3px; font-size:14px; flex-shrink:0; }
-  @media (max-width:480px){
-    .shifts-table th, .shifts-table td{ padding:8px 6px; }
-    .shift-chip-text{ max-width:150px; }
-    .shift-inline-edit input[type=text]{ min-width:90px; }
-  }
-
   /* Home */
   .home-greeting h2{ font-size:22px; margin:0 0 4px; }
 
@@ -334,52 +320,103 @@
   .week-pill.today:not(.selected){ border-color:var(--color-accent); color:var(--color-accent); }
   .week-pill.selected{ background:var(--color-accent); border-color:var(--color-accent); color:#fff; }
 
-  .home-grid{ display:grid; grid-template-columns:1.6fr 1fr; gap:20px; align-items:start; }
+  .home-greeting-row{ display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
+  .home-date{ color:var(--color-text-muted); font-size:13px; font-weight:500; }
+
   .home-section-head{ margin-bottom:12px; }
   .home-section-head h2{ margin:0; }
-  .home-side{ display:flex; flex-direction:column; gap:14px; }
+  .home-section-head-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .home-view-all{ background:none; border:none; color:var(--color-accent); font-size:12px; font-weight:600; cursor:pointer; padding:0; font-family:inherit; }
+  .home-view-all:hover{ text-decoration:underline; }
 
-  @keyframes homeCardIn{
-    from{ opacity:0; transform:translateY(6px); }
+  .home-card{ border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); padding:16px; box-shadow:0 1px 3px rgba(24,24,27,0.05); }
+
+  /* Stat card dashboard row */
+  .stat-card-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; margin:20px 0; }
+  .stat-card{
+    text-align:left;
+    border:1px solid var(--color-border);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  .stat-card:active{ transform:scale(0.97); }
+  @media (hover:hover) and (pointer:fine){
+    .stat-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(24,24,27,0.12); }
+  }
+  .stat-card:focus-visible{ outline:2px solid var(--color-accent); outline-offset:2px; }
+  .stat-card-icon{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+  .stat-card-icon svg{ width:18px; height:18px; }
+  .stat-card-label{ display:block; font-size:12px; font-weight:700; color:var(--color-text-muted); margin-bottom:4px; }
+  .stat-card-value{ display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; font-size:22px; font-weight:800; letter-spacing:-0.02em; line-height:1.2; }
+  .stat-card-sub{ display:block; font-size:12px; color:var(--color-text-muted); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .stat-card.acc-shift{ background:var(--acc-shift-bg); }
+  .stat-card.acc-shift .stat-card-icon{ background:rgba(37,99,235,0.14); color:var(--acc-shift); }
+  .stat-card.acc-shift .stat-card-value{ color:var(--acc-shift); }
+  .stat-card.acc-schedule{ background:var(--acc-schedule-bg); }
+  .stat-card.acc-schedule .stat-card-icon{ background:rgba(124,58,237,0.14); color:var(--acc-schedule); }
+  .stat-card.acc-schedule .stat-card-value{ color:var(--acc-schedule); }
+  .stat-card.acc-budget{ background:var(--acc-budget-bg); }
+  .stat-card.acc-budget .stat-card-icon{ background:rgba(217,119,6,0.14); color:var(--acc-budget); }
+  .stat-card.acc-budget .stat-card-value{ color:var(--acc-budget); }
+  .stat-card.acc-apps{ background:var(--acc-apps-bg); }
+  .stat-card.acc-apps .stat-card-icon{ background:rgba(5,150,105,0.14); color:var(--acc-apps); }
+  .stat-card.acc-apps .stat-card-value{ color:var(--acc-apps); }
+
+  @keyframes statCardIn{
+    from{ opacity:0; transform:translateY(8px); }
     to{ opacity:1; transform:translateY(0); }
   }
-  .home-upcoming-card{
-    opacity:0;
-    animation:homeCardIn 300ms cubic-bezier(0.23,1,0.32,1) forwards;
+  @media (prefers-reduced-motion: no-preference){
+    .stat-card{ opacity:0; animation:statCardIn 220ms cubic-bezier(0.23,1,0.32,1) forwards; }
+    .stat-card:nth-child(1){ animation-delay:0ms; }
+    .stat-card:nth-child(2){ animation-delay:45ms; }
+    .stat-card:nth-child(3){ animation-delay:90ms; }
+    .stat-card:nth-child(4){ animation-delay:135ms; }
+    .stat-card:nth-child(5){ animation-delay:180ms; }
+  }
+
+  /* Up next / Recent applications */
+  .home-two-col{ display:grid; grid-template-columns:1.5fr 1fr; gap:20px; align-items:start; margin-top:8px; }
+  @media (max-width:760px){ .home-two-col{ grid-template-columns:1fr; } }
+
+  .home-upnext-list{ display:flex; flex-direction:column; gap:10px; }
+  .upnext-item{
     border:1px solid var(--color-border);
     border-left:3px solid transparent;
     border-radius:10px;
-    padding:12px 14px;
+    padding:10px 14px;
     background:var(--color-surface);
     box-shadow:0 1px 3px rgba(24,24,27,0.05);
-    margin-bottom:10px;
-    transition:transform 150ms ease-out, box-shadow 150ms ease-out;
   }
-  .home-upcoming-card:hover{ transform:translateY(-1px); box-shadow:0 4px 10px rgba(24,24,27,0.10); }
-  .home-upcoming-card.college{ border-left-color:var(--college-text); }
-  .home-upcoming-card.personal{ border-left-color:var(--personal-text); }
-  .home-upcoming-card.other{ border-left-color:var(--other-text); }
-  .home-upcoming-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px; }
-  .home-upcoming-badge{ display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--color-bg); color:var(--color-text-muted); white-space:nowrap; }
-  .home-upcoming-card.next-up .home-upcoming-badge{ background:var(--color-accent); color:#fff; }
-  .home-upcoming-time{ font-size:12px; color:var(--color-text-muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .home-upcoming-title{ font-weight:700; font-size:14px; }
-  .home-upcoming-loc{ font-size:12px; color:var(--color-text-muted); margin-top:2px; }
+  .upnext-item.src-schedule{ border-left-color:var(--acc-schedule); }
+  .upnext-item.src-lunch{ border-left-color:var(--lunch-text); }
+  .upnext-item.src-dinner{ border-left-color:var(--dinner-text); }
+  .upnext-item.src-application{ border-left-color:var(--acc-apps); }
+  .upnext-item-label{ font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:2px; }
+  .upnext-item-title{ font-weight:700; font-size:14px; }
+  .upnext-item-sub{ font-size:12px; color:var(--color-text-muted); margin-top:2px; }
 
-  .home-card{ border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); padding:16px; box-shadow:0 1px 3px rgba(24,24,27,0.05); }
-  .home-card-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-text-muted); margin-bottom:8px; }
-  .home-card-value{ font-size:18px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .home-card-sub{ font-size:12px; color:var(--color-text-muted); margin-top:4px; }
-  .home-card-row{ display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:4px 0; gap:8px; }
-  .home-card-row span{ color:var(--color-text-muted); flex-shrink:0; }
-  .home-card-row b{ font-weight:700; max-width:65%; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .home-meal-slot{ display:flex; justify-content:flex-end; min-width:0; }
-  .home-meal-slot .meal-chip-text{ max-width:130px; }
+  .home-recent-list{ display:flex; flex-direction:column; border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); overflow:hidden; box-shadow:0 1px 3px rgba(24,24,27,0.05); }
+  .recent-app-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--color-border); cursor:pointer; transition:background-color 120ms ease-out; }
+  .recent-app-row:last-child{ border-bottom:none; }
+  .recent-app-row:hover{ background:var(--color-bg); }
+  .recent-app-title{ font-weight:700; font-size:13px; }
+  .recent-app-meta{ font-size:11px; color:var(--color-text-muted); margin-top:2px; }
 
-  .home-card-link{ cursor:pointer; transition:transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out; }
-  .home-card-link:hover{ transform:translateY(-1px); box-shadow:0 4px 10px rgba(24,24,27,0.10); border-color:var(--color-accent); }
-  .home-card-link:active{ transform:translateY(0) scale(0.98); }
-  .home-card-link:focus-visible{ outline:2px solid var(--color-accent); outline-offset:2px; }
+  /* Quick actions */
+  .home-quick-actions{ display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
+  .qa-btn{ border:1px solid var(--color-border); border-radius:999px; padding:8px 14px; background:var(--color-surface); color:var(--color-text); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; }
+  .qa-btn:hover{ border-color:var(--color-accent); color:var(--color-accent); }
+  .qa-btn:active{ transform:scale(0.97); }
+
+  /* Per-section accent on the active tab's own content (color system part b) */
+  #tab-schedule .toolbar{ border-top:3px solid var(--acc-schedule); padding-top:14px; }
+  #tab-budget > h2{ display:inline-block; padding-bottom:6px; border-bottom:3px solid var(--acc-budget); }
+  #tab-applications > h2{ display:inline-block; padding-bottom:6px; border-bottom:3px solid var(--acc-apps); }
 
   .mini-cal-head{ display:flex; align-items:center; margin-bottom:10px; }
   .mini-cal-title{ flex:1; text-align:center; font-weight:700; font-size:13px; }
@@ -396,10 +433,6 @@
   .mini-cal-day.in-month:active{ transform:scale(0.9); }
   .mini-cal-day.today:not(.selected){ box-shadow:inset 0 0 0 1.5px var(--color-accent); color:var(--color-accent); font-weight:800; }
   .mini-cal-day.selected, .mini-cal-day.selected:hover{ background:var(--color-accent); color:#fff; font-weight:800; }
-
-  @media (max-width:760px){
-    .home-grid{ grid-template-columns:1fr; }
-  }
 
   @media (max-width:480px){
     .col-num{ width:20px; }
@@ -462,61 +495,74 @@
 
   <section id="tab-home" class="tab-panel" role="tabpanel">
     <div class="home-greeting">
-      <h2 id="homeGreeting">Good morning, Sanj 👋</h2>
+      <div class="home-greeting-row">
+        <h2 id="homeGreeting">Good morning, Sanj 👋</h2>
+        <span class="home-date" id="homeDate"></span>
+      </div>
       <p class="sub" id="homeSubtitle">Here's your day at a glance.</p>
     </div>
 
     <div class="week-strip" id="weekStrip"></div>
 
-    <div class="home-grid">
-      <div class="home-main">
-        <div class="home-section-head">
-          <h2 id="homeUpcomingHeading">Up next today</h2>
-        </div>
-        <div class="home-upcoming-list" id="homeUpcomingList"></div>
+    <div class="stat-card-row" id="statCardRow">
+      <button type="button" class="stat-card acc-shift" id="statCardShift" aria-label="Today's shift, opens shift details">
+        <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+        <span class="stat-card-label">Shift</span>
+        <span class="stat-card-value" id="statShiftValue">—</span>
+      </button>
+      <button type="button" class="stat-card acc-schedule" id="statCardSchedule" aria-label="Schedule, view Schedule tab">
+        <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+        <span class="stat-card-label">Schedule</span>
+        <span class="stat-card-value" id="statScheduleValue">—</span>
+        <span class="stat-card-sub" id="statScheduleSub"></span>
+      </button>
+      <button type="button" class="stat-card acc-budget" id="statCardBudget" aria-label="Budget, view Budget tab">
+        <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span>
+        <span class="stat-card-label">Budget</span>
+        <span class="stat-card-value" id="statBudgetValue">$0.00</span>
+        <span class="stat-card-sub" id="statBudgetSub"></span>
+      </button>
+      <button type="button" class="stat-card acc-apps" id="statCardApps" aria-label="Applications, view Applications tab">
+        <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
+        <span class="stat-card-label">Applications</span>
+        <span class="stat-card-value" id="statAppsValue">0</span>
+        <span class="stat-card-sub" id="statAppsSub"></span>
+      </button>
+    </div>
 
-        <div class="shifts-dashboard" id="shiftsDashboard">
-          <div class="home-section-head">
-            <h2>This week's shifts</h2>
-          </div>
-          <div class="app-stats" id="shiftsStats"></div>
-          <table class="meal-table shifts-table" id="shiftsTable">
-            <thead>
-              <tr><th style="width:110px;">Day</th><th>Shifts</th></tr>
-            </thead>
-            <tbody id="shiftsTableBody"></tbody>
-          </table>
+    <div class="home-two-col">
+      <div>
+        <div class="home-section-head">
+          <h2 id="homeUpNextHeading">Up next today</h2>
         </div>
+        <div class="home-upnext-list" id="homeUpNextList"></div>
       </div>
-      <div class="home-side">
-        <div class="home-card">
-          <div class="home-card-label">Today's meals</div>
-          <div class="home-card-row"><span>Lunch</span><div class="home-meal-slot" id="homeLunchSlot"></div></div>
-          <div class="home-card-row"><span>Dinner</span><div class="home-meal-slot" id="homeDinnerSlot"></div></div>
+      <div>
+        <div class="home-section-head-row">
+          <h2>Recent applications</h2>
+          <button type="button" class="home-view-all" id="homeRecentAppsViewAll">View all</button>
         </div>
-        <div class="home-card home-card-link" id="homeBudgetCard" role="button" tabindex="0">
-          <div class="home-card-label" id="homeBudgetLabel">Budget</div>
-          <div class="home-card-value" id="homeBudgetVal">$0.00</div>
-          <div class="home-card-sub" id="homeBudgetSub"></div>
-        </div>
-        <div class="home-card home-card-link" id="homeAppCard" role="button" tabindex="0">
-          <div class="home-card-label">Next follow-up</div>
-          <div class="home-card-value" id="homeAppVal">No follow-ups scheduled</div>
-          <div class="home-card-sub" id="homeAppSub"></div>
-        </div>
-        <div class="home-card" id="homeCalendarCard">
-          <div class="mini-cal-head">
-            <button type="button" class="mini-cal-nav-btn" id="miniCalPrev" aria-label="Previous month">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-            <div class="mini-cal-title" id="miniCalTitle"></div>
-            <button type="button" class="mini-cal-nav-btn" id="miniCalNext" aria-label="Next month">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          </div>
-          <div class="mini-cal-grid" id="miniCalGrid"></div>
-        </div>
+        <div class="home-recent-list" id="homeRecentAppsList"></div>
       </div>
+    </div>
+
+    <div class="home-quick-actions" id="homeQuickActions">
+      <button type="button" class="qa-btn" id="qaAddBlock">+ Add time block</button>
+      <button type="button" class="qa-btn" id="qaLogExpense">+ Log expense</button>
+      <button type="button" class="qa-btn" id="qaAddApp">+ Add application</button>
+    </div>
+
+    <div class="home-card" id="homeCalendarCard">
+      <div class="mini-cal-head">
+        <button type="button" class="mini-cal-nav-btn" id="miniCalPrev" aria-label="Previous month">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="mini-cal-title" id="miniCalTitle"></div>
+        <button type="button" class="mini-cal-nav-btn" id="miniCalNext" aria-label="Next month">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+      <div class="mini-cal-grid" id="miniCalGrid"></div>
     </div>
   </section>
 
@@ -955,7 +1001,6 @@
   var appSearchQuery = '';
   var shifts = [];
   var shiftExpandedDay = null;
-  var shiftTableEditing = null;
 
   var grid = document.getElementById('grid');
   var emptyHint = document.getElementById('emptyHint');
@@ -2013,8 +2058,7 @@
 
   function refreshShiftViews(){
     renderShiftToday();
-    renderShiftsTable();
-    renderShiftsStats();
+    renderStatCards();
   }
 
   function openShiftPanel(){
@@ -2188,12 +2232,18 @@
     document.getElementById('homeSubtitle').textContent = DAY_NAMES_FULL[selectedDayIndex] + '’s plan at a glance.';
   }
 
+  function renderHomeDate(){
+    var d = bostonNow();
+    var el = document.getElementById('homeDate');
+    if(el) el.textContent = DAY_NAMES_FULL[getTodayIndex()] + ', ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getDate();
+  }
+
   function selectDay(dayIndex){
     selectedDayIndex = dayIndex;
     selectedCalDate = null;
     renderWeekStrip();
     renderHomeGreeting();
-    renderHomeUpcoming();
+    renderHomeUpNext();
     renderMiniCal();
   }
 
@@ -2203,7 +2253,7 @@
     selectedCalDate = { y: year, m: month, d: dayNum };
     renderWeekStrip();
     renderHomeGreeting();
-    renderHomeUpcoming();
+    renderHomeUpNext();
     renderMiniCal();
   }
 
@@ -2231,94 +2281,34 @@
     return result.sort(function(a, b){ return toMinutes(a.start) - toMinutes(b.start); });
   }
 
-  function renderHomeUpcoming(){
-    var isToday = selectedDayIndex === getTodayIndex();
-    document.getElementById('homeUpcomingHeading').textContent = isToday ? 'Up next today' : DAY_NAMES_FULL[selectedDayIndex];
+  function appendEmptyRow(container, text){
+    var empty = document.createElement('div');
+    empty.className = 'app-empty';
+    empty.textContent = text;
+    container.appendChild(empty);
+  }
 
-    var listEl = document.getElementById('homeUpcomingList');
-    listEl.innerHTML = '';
-    var dayEvents = getDayEvents(selectedDayIndex, isToday);
-    if(dayEvents.length === 0){
-      var empty = document.createElement('div');
-      empty.className = 'app-empty';
-      empty.textContent = isToday
-        ? 'Nothing left on today’s schedule — enjoy the rest of your day.'
-        : 'Nothing scheduled for ' + DAY_NAMES_FULL[selectedDayIndex] + '.';
-      listEl.appendChild(empty);
-      return;
+  function buildUpNextItem(cls, label, title, sub){
+    var item = document.createElement('div');
+    item.className = 'upnext-item ' + cls;
+    var labelEl = document.createElement('div');
+    labelEl.className = 'upnext-item-label';
+    labelEl.textContent = label;
+    var titleEl = document.createElement('div');
+    titleEl.className = 'upnext-item-title';
+    titleEl.textContent = title;
+    item.appendChild(labelEl);
+    item.appendChild(titleEl);
+    if(sub){
+      var subEl = document.createElement('div');
+      subEl.className = 'upnext-item-sub';
+      subEl.textContent = sub;
+      item.appendChild(subEl);
     }
-    dayEvents.forEach(function(ev, idx){
-      var card = document.createElement('div');
-      card.className = 'home-upcoming-card ' + ev.category + (isToday && idx === 0 ? ' next-up' : '');
-      card.style.animationDelay = (idx * 50) + 'ms';
-
-      var head = document.createElement('div');
-      head.className = 'home-upcoming-head';
-      var badge = document.createElement('span');
-      badge.className = 'home-upcoming-badge';
-      badge.textContent = (isToday && idx === 0) ? 'Next up' : CATEGORY_LABEL[ev.category];
-      var time = document.createElement('span');
-      time.className = 'home-upcoming-time';
-      time.textContent = ev.start + '–' + ev.end;
-      head.appendChild(badge);
-      head.appendChild(time);
-
-      var title = document.createElement('div');
-      title.className = 'home-upcoming-title';
-      title.textContent = ev.title;
-
-      card.appendChild(head);
-      card.appendChild(title);
-
-      if(ev.loc){
-        var loc = document.createElement('div');
-        loc.className = 'home-upcoming-loc';
-        loc.textContent = ev.loc;
-        card.appendChild(loc);
-      }
-
-      listEl.appendChild(card);
-    });
+    return item;
   }
 
-  function renderHomeMealsCard(){
-    var todayIndex = getTodayIndex();
-    var entry = meals.find(function(m){ return m.day === todayIndex; }) || { day: todayIndex, toMake: 0, lunch: '', dinner: '' };
-    buildMealSlot(document.getElementById('homeLunchSlot'), entry, 'lunch', 'What’s for lunch');
-    buildMealSlot(document.getElementById('homeDinnerSlot'), entry, 'dinner', 'What’s for dinner');
-  }
-
-  function goToTab(name){
-    var btn = document.getElementById('tabBtn' + name.charAt(0).toUpperCase() + name.slice(1));
-    if(btn) btn.click();
-  }
-
-  function bindCardActivation(cardEl, handler){
-    cardEl.onclick = handler;
-    cardEl.onkeydown = function(e){
-      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); handler(); }
-    };
-  }
-
-  function renderHomeBudgetCard(){
-    var active = getActiveBudget();
-    var labelEl = document.getElementById('homeBudgetLabel');
-    var valEl = document.getElementById('homeBudgetVal');
-    var subEl = document.getElementById('homeBudgetSub');
-    if(!active){
-      labelEl.textContent = 'Budget';
-      valEl.textContent = '$0.00';
-      subEl.textContent = 'No budget yet';
-    }else{
-      var total = active.categories.reduce(function(sum, cat){ return sum + categoryTotal(cat); }, 0);
-      labelEl.textContent = active.name || 'Budget';
-      valEl.textContent = '$' + formatMoney(total);
-      subEl.textContent = active.categories.length + ' categor' + (active.categories.length === 1 ? 'y' : 'ies');
-    }
-    bindCardActivation(document.getElementById('homeBudgetCard'), function(){ goToTab('budget'); });
-  }
-
-  function renderHomeAppsCard(){
+  function getNearestFollowUp(){
     var todayIso = appTodayIso();
     var withFollowUp = applications.filter(function(a){ return a.followUpDate; });
     var upcoming = withFollowUp
@@ -2328,23 +2318,173 @@
       .filter(function(a){ return a.followUpDate < todayIso; })
       .sort(function(a, b){ return a.followUpDate.localeCompare(b.followUpDate); });
     var pick = upcoming[0] || overdue[0];
-    var valEl = document.getElementById('homeAppVal');
-    var subEl = document.getElementById('homeAppSub');
-    var cardEl = document.getElementById('homeAppCard');
-    if(!pick){
-      valEl.textContent = 'No follow-ups scheduled';
-      subEl.textContent = '';
-      bindCardActivation(cardEl, function(){ goToTab('applications'); });
+    if(!pick) return null;
+    return { app: pick, overdue: pick.followUpDate < todayIso };
+  }
+
+  function getNextUpcomingEvent(){
+    var todayIndex = getTodayIndex();
+    for(var offset = 0; offset < 7; offset++){
+      var d = (todayIndex + offset) % 7;
+      var dayEvents = offset === 0 ? getDayEvents(d, true) : getDayEvents(d, false);
+      if(dayEvents.length){ return { ev: dayEvents[0], day: d, isToday: offset === 0 }; }
+    }
+    return null;
+  }
+
+  function renderHomeUpNext(){
+    var isToday = selectedDayIndex === getTodayIndex();
+    var headingEl = document.getElementById('homeUpNextHeading');
+    var listEl = document.getElementById('homeUpNextList');
+    listEl.innerHTML = '';
+
+    if(!isToday){
+      headingEl.textContent = DAY_NAMES_FULL[selectedDayIndex];
+      var dayEvents = getDayEvents(selectedDayIndex, false);
+      if(dayEvents.length === 0){
+        appendEmptyRow(listEl, 'Nothing scheduled for ' + DAY_NAMES_FULL[selectedDayIndex] + '.');
+        return;
+      }
+      dayEvents.forEach(function(ev){
+        listEl.appendChild(buildUpNextItem('src-schedule', CATEGORY_LABEL[ev.category], ev.title, ev.start + '–' + ev.end + (ev.loc ? ' · ' + ev.loc : '')));
+      });
       return;
     }
-    valEl.textContent = pick.company + ' — ' + pick.role;
-    var isOverdue = pick.followUpDate < todayIso;
-    subEl.textContent = (isOverdue ? 'Overdue since ' : 'Follow up by ') + formatAppDate(pick.followUpDate);
-    bindCardActivation(cardEl, function(){
-      goToTab('applications');
-      openAppModal(pick);
+
+    headingEl.textContent = 'Up next today';
+    var todayIndex = getTodayIndex();
+    var hasAny = false;
+
+    var nextEvent = getDayEvents(todayIndex, true)[0];
+    if(nextEvent){
+      hasAny = true;
+      listEl.appendChild(buildUpNextItem('src-schedule', 'Next up', nextEvent.title, nextEvent.start + '–' + nextEvent.end + (nextEvent.loc ? ' · ' + nextEvent.loc : '')));
+    }
+
+    var mealEntry = meals.find(function(m){ return m.day === todayIndex; });
+    if(mealEntry && mealEntry.lunch){
+      hasAny = true;
+      listEl.appendChild(buildUpNextItem('src-lunch', 'Lunch', mealEntry.lunch, ''));
+    }
+    if(mealEntry && mealEntry.dinner){
+      hasAny = true;
+      listEl.appendChild(buildUpNextItem('src-dinner', 'Dinner', mealEntry.dinner, ''));
+    }
+
+    var followUp = getNearestFollowUp();
+    if(followUp){
+      hasAny = true;
+      listEl.appendChild(buildUpNextItem(
+        'src-application',
+        followUp.overdue ? 'Overdue follow-up' : 'Follow-up',
+        followUp.app.company + ' — ' + followUp.app.role,
+        (followUp.overdue ? 'Overdue since ' : 'By ') + formatAppDate(followUp.app.followUpDate)
+      ));
+    }
+
+    if(!hasAny){
+      appendEmptyRow(listEl, 'Nothing left on today’s schedule — enjoy the rest of your day.');
+    }
+  }
+
+  function goToTab(name){
+    var btn = document.getElementById('tabBtn' + name.charAt(0).toUpperCase() + name.slice(1));
+    if(btn) btn.click();
+  }
+
+  function renderStatCards(){
+    var todayIndex = getTodayIndex();
+
+    document.getElementById('statShiftValue').textContent = shiftSummaryText(getShiftDay(todayIndex).entries);
+
+    var remaining = getDayEvents(todayIndex, true);
+    var scheduleValueEl = document.getElementById('statScheduleValue');
+    var scheduleSubEl = document.getElementById('statScheduleSub');
+    if(remaining.length > 0){
+      scheduleValueEl.textContent = remaining.length + (remaining.length === 1 ? ' block left' : ' blocks left');
+      scheduleSubEl.textContent = remaining[0].title + ' · ' + remaining[0].start + '–' + remaining[0].end;
+    }else{
+      var next = getNextUpcomingEvent();
+      if(next){
+        scheduleValueEl.textContent = next.ev.title;
+        scheduleSubEl.textContent = (next.isToday ? '' : DAY_NAMES[next.day] + ' · ') + next.ev.start + '–' + next.ev.end;
+      }else{
+        scheduleValueEl.textContent = 'Nothing scheduled';
+        scheduleSubEl.textContent = '';
+      }
+    }
+
+    var active = getActiveBudget();
+    var budgetValueEl = document.getElementById('statBudgetValue');
+    var budgetSubEl = document.getElementById('statBudgetSub');
+    if(active){
+      var total = active.categories.reduce(function(sum, cat){ return sum + categoryTotal(cat); }, 0);
+      budgetValueEl.textContent = '$' + formatMoney(total);
+      budgetSubEl.textContent = active.name || 'Budget';
+    }else{
+      budgetValueEl.textContent = '$0.00';
+      budgetSubEl.textContent = 'No budget yet';
+    }
+
+    var activeApps = applications.filter(function(a){ return a.status !== 'Rejected' && a.status !== 'Ghosted'; }).length;
+    var offers = applications.filter(function(a){ return a.status === 'Offer'; }).length;
+    document.getElementById('statAppsValue').textContent = activeApps;
+    document.getElementById('statAppsSub').textContent = offers > 0 ? (offers + ' offer' + (offers === 1 ? '' : 's')) : '';
+  }
+
+  function renderRecentApplications(){
+    var listEl = document.getElementById('homeRecentAppsList');
+    listEl.innerHTML = '';
+    var recent = applications.slice()
+      .sort(function(a, b){ return (b.dateApplied || '').localeCompare(a.dateApplied || ''); })
+      .slice(0, 3);
+    if(recent.length === 0){
+      appendEmptyRow(listEl, 'No applications yet.');
+      return;
+    }
+    recent.forEach(function(a){
+      var row = document.createElement('div');
+      row.className = 'recent-app-row';
+
+      var left = document.createElement('div');
+      var title = document.createElement('div');
+      title.className = 'recent-app-title';
+      title.textContent = a.company + ' — ' + a.role;
+      var meta = document.createElement('div');
+      meta.className = 'recent-app-meta';
+      meta.textContent = formatAppDate(a.dateApplied);
+      left.appendChild(title);
+      left.appendChild(meta);
+
+      var badge = document.createElement('span');
+      badge.className = 'app-badge ' + APP_STATUS_CLASS[a.status];
+      badge.textContent = a.status;
+
+      row.appendChild(left);
+      row.appendChild(badge);
+      row.addEventListener('click', function(){ goToTab('applications'); openAppModal(a); });
+      listEl.appendChild(row);
     });
   }
+
+  document.getElementById('statCardShift').addEventListener('click', function(e){
+    e.stopPropagation();
+    if(shiftPanel.classList.contains('open')) closeShiftPanel();
+    else openShiftPanel();
+  });
+  document.getElementById('statCardSchedule').addEventListener('click', function(){ goToTab('schedule'); });
+  document.getElementById('statCardBudget').addEventListener('click', function(){ goToTab('budget'); });
+  document.getElementById('statCardApps').addEventListener('click', function(){ goToTab('applications'); });
+  document.getElementById('homeRecentAppsViewAll').addEventListener('click', function(){ goToTab('applications'); });
+
+  document.getElementById('qaAddBlock').addEventListener('click', function(){ goToTab('schedule'); openModal(0, null); });
+  document.getElementById('qaAddApp').addEventListener('click', function(){ goToTab('applications'); openAppModal(null); });
+  document.getElementById('qaLogExpense').addEventListener('click', function(){
+    goToTab('budget');
+    var addItemBtn = document.querySelector('#budgetBody .category-add-row button');
+    if(addItemBtn){ addItemBtn.click(); }
+    else{ document.getElementById('budgetAddCategoryBtn').click(); }
+  });
 
   var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var miniCalMonth = bostonNow();
@@ -2412,221 +2552,12 @@
 
   function renderHome(){
     renderHomeGreeting();
+    renderHomeDate();
     renderWeekStrip();
-    renderHomeUpcoming();
-    renderHomeMealsCard();
-    renderHomeBudgetCard();
-    renderHomeAppsCard();
+    renderStatCards();
+    renderHomeUpNext();
+    renderRecentApplications();
     renderMiniCal();
-    renderShiftsTable();
-    renderShiftsStats();
-  }
-
-  /* ---------- Shifts dashboard (Home tab) ---------- */
-
-  function shiftStat(container, label, value){
-    var el = document.createElement('div');
-    el.className = 'app-stat';
-    var lbl = document.createElement('span');
-    lbl.textContent = label + ': ';
-    var val = document.createElement('b');
-    val.textContent = value;
-    el.appendChild(lbl);
-    el.appendChild(val);
-    container.appendChild(el);
-  }
-
-  function renderShiftsStats(){
-    var statsEl = document.getElementById('shiftsStats');
-    if(!statsEl) return;
-    statsEl.innerHTML = '';
-
-    var workingDays = 0, totalMinutes = 0;
-    for(var d = 0; d < 7; d++){
-      var day = getShiftDay(d);
-      if(day.entries.length) workingDays++;
-      day.entries.forEach(function(e){
-        totalMinutes += Math.max(0, toMinutes(e.end) - toMinutes(e.start));
-      });
-    }
-    var hoursText = (Math.round((totalMinutes / 60) * 10) / 10) + 'h';
-
-    var todayIndex = getTodayIndex();
-    var now = bostonNow();
-    var nowMin = now.getHours() * 60 + now.getMinutes();
-    var next = null;
-    for(var offset = 0; offset < 7 && !next; offset++){
-      var d2 = (todayIndex + offset) % 7;
-      var day2 = getShiftDay(d2);
-      var candidates = day2.entries.filter(function(e){
-        return offset > 0 || toMinutes(e.start) > nowMin;
-      }).slice().sort(function(a, b){ return toMinutes(a.start) - toMinutes(b.start); });
-      if(candidates.length){ next = { day: d2, entry: candidates[0], isToday: offset === 0 }; }
-    }
-
-    shiftStat(statsEl, 'Working days', workingDays + '/7');
-    shiftStat(statsEl, 'Hours this week', hoursText);
-    shiftStat(statsEl, 'Next shift', next
-      ? (next.isToday ? 'Today' : DAY_NAMES[next.day]) + ' ' + formatShiftTime(next.entry.start)
-      : 'None scheduled');
-  }
-
-  function buildShiftChip(dayEntry, entry, idx, d){
-    var chip = document.createElement('div');
-    chip.className = 'shift-chip';
-
-    var text = document.createElement('button');
-    text.type = 'button';
-    text.className = 'shift-chip-text';
-    text.textContent = (entry.location || 'Untitled') + ' · ' + formatShiftTime(entry.start) + '–' + formatShiftTime(entry.end);
-    text.title = 'Click to edit';
-    text.addEventListener('click', function(){
-      shiftTableEditing = { day: d, idx: idx };
-      renderShiftsTable();
-    });
-    chip.appendChild(text);
-
-    var removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'x';
-    removeBtn.setAttribute('aria-label', 'Remove this shift');
-    removeBtn.textContent = '×';
-    removeBtn.addEventListener('click', function(){
-      dayEntry.entries = dayEntry.entries.filter(function(_, i){ return i !== idx; });
-      saveShifts();
-      if(shiftTableEditing && shiftTableEditing.day === d) shiftTableEditing = null;
-      refreshShiftViews();
-    });
-    chip.appendChild(removeBtn);
-
-    return chip;
-  }
-
-  function buildShiftEditor(dayEntry, entry, idx, d){
-    var wrap = document.createElement('div');
-    wrap.className = 'shift-inline-edit';
-
-    var locInput = document.createElement('input');
-    locInput.type = 'text';
-    locInput.value = entry.location;
-    locInput.placeholder = 'Location';
-    locInput.addEventListener('change', function(){
-      entry.location = locInput.value.trim();
-      saveShifts();
-      renderShiftToday();
-      renderShiftsStats();
-    });
-    wrap.appendChild(locInput);
-
-    var startInput = document.createElement('input');
-    startInput.type = 'time';
-    startInput.value = entry.start;
-    startInput.addEventListener('change', function(){
-      entry.start = startInput.value;
-      saveShifts();
-      renderShiftToday();
-      renderShiftsStats();
-    });
-    wrap.appendChild(startInput);
-
-    var sep = document.createElement('span');
-    sep.className = 'shift-time-sep';
-    sep.textContent = 'to';
-    wrap.appendChild(sep);
-
-    var endInput = document.createElement('input');
-    endInput.type = 'time';
-    endInput.value = entry.end;
-    endInput.addEventListener('change', function(){
-      entry.end = endInput.value;
-      saveShifts();
-      renderShiftToday();
-      renderShiftsStats();
-    });
-    wrap.appendChild(endInput);
-
-    var doneBtn = document.createElement('button');
-    doneBtn.type = 'button';
-    doneBtn.className = 'x';
-    doneBtn.setAttribute('aria-label', 'Done editing');
-    doneBtn.textContent = '✓';
-    doneBtn.addEventListener('click', function(){
-      shiftTableEditing = null;
-      renderShiftsTable();
-    });
-    wrap.appendChild(doneBtn);
-
-    var removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'x';
-    removeBtn.setAttribute('aria-label', 'Remove this shift');
-    removeBtn.textContent = '×';
-    removeBtn.addEventListener('click', function(){
-      dayEntry.entries = dayEntry.entries.filter(function(_, i){ return i !== idx; });
-      saveShifts();
-      shiftTableEditing = null;
-      refreshShiftViews();
-    });
-    wrap.appendChild(removeBtn);
-
-    return wrap;
-  }
-
-  function renderShiftsTable(){
-    var body = document.getElementById('shiftsTableBody');
-    if(!body) return;
-    body.innerHTML = '';
-    var todayIndex = getTodayIndex();
-
-    for(var d = 0; d < 7; d++){
-      (function(d){
-        var dayEntry = getShiftDay(d);
-        var tr = document.createElement('tr');
-        tr.className = d === todayIndex ? 'today-row' : '';
-
-        var dayTd = document.createElement('td');
-        dayTd.className = 'day-cell';
-        dayTd.textContent = DAY_NAMES_FULL[d];
-        tr.appendChild(dayTd);
-
-        var entriesTd = document.createElement('td');
-        var cell = document.createElement('div');
-        cell.className = 'shifts-entries-cell';
-
-        if(dayEntry.entries.length === 0){
-          var off = document.createElement('span');
-          off.className = 'shift-off-label';
-          off.textContent = 'Off';
-          cell.appendChild(off);
-        }
-
-        dayEntry.entries.forEach(function(entry, idx){
-          var isEditing = shiftTableEditing && shiftTableEditing.day === d && shiftTableEditing.idx === idx;
-          cell.appendChild(isEditing ? buildShiftEditor(dayEntry, entry, idx, d) : buildShiftChip(dayEntry, entry, idx, d));
-        });
-
-        var addBtn = document.createElement('button');
-        addBtn.type = 'button';
-        addBtn.className = 'meal-add-btn';
-        addBtn.setAttribute('aria-label', 'Add shift for ' + DAY_NAMES_FULL[d]);
-        addBtn.textContent = '+';
-        addBtn.addEventListener('click', function(){
-          if(!shifts.some(function(s){ return s.day === d; })){ shifts.push(dayEntry); }
-          dayEntry.entries.push({ location: '', start: '09:00', end: '17:00' });
-          saveShifts();
-          shiftTableEditing = { day: d, idx: dayEntry.entries.length - 1 };
-          refreshShiftViews();
-          var loc = document.querySelector('#shiftsTableBody .shift-inline-edit input[type=text]');
-          if(loc) loc.focus();
-        });
-        cell.appendChild(addBtn);
-
-        entriesTd.appendChild(cell);
-        tr.appendChild(entriesTd);
-
-        body.appendChild(tr);
-      })(d);
-    }
   }
 
   /* ---------- Backup / restore ---------- */
