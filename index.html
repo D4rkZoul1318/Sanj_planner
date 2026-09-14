@@ -302,6 +302,28 @@
   .shift-entry-times .shift-time-sep{ font-size:11px; color:var(--color-text-muted); flex-shrink:0; }
   .shift-add-entry-btn{ margin-top:4px; }
 
+  .shifts-dashboard{ margin-top:22px; }
+  .shifts-table td, .shifts-table th{ vertical-align:middle; }
+  .shifts-table .day-cell{ font-weight:700; font-size:13px; white-space:nowrap; }
+  .shifts-table tr.today-row{ background:var(--color-bg); }
+  .shifts-table tr.today-row .day-cell{ color:var(--color-accent); }
+  .shifts-entries-cell{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .shift-off-label{ color:var(--color-text-muted); font-size:13px; font-style:italic; }
+  .shift-chip{ display:inline-flex; align-items:center; gap:4px; max-width:100%; min-width:0; background:var(--color-bg); border:1px solid var(--color-border); border-radius:999px; padding:4px 4px 4px 12px; font-size:13px; }
+  .shift-chip-text{ cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; max-width:260px; color:var(--color-text); font-weight:600; background:none; border:none; padding:0; font-family:inherit; }
+  .shift-chip-text:hover{ color:var(--color-accent); }
+  .shift-chip .x{ padding:3px; font-size:14px; flex-shrink:0; }
+  .shift-inline-edit{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; background:var(--color-bg); border:1px solid var(--color-border); border-radius:8px; padding:6px 8px; }
+  .shift-inline-edit input[type=text]{ padding:5px 7px; border:1px solid var(--color-border); border-radius:6px; font-size:12px; min-width:110px; flex:1; background:var(--color-surface); }
+  .shift-inline-edit input[type=time]{ padding:5px 4px; border:1px solid var(--color-border); border-radius:6px; font-size:12px; background:var(--color-surface); }
+  .shift-inline-edit .shift-time-sep{ font-size:11px; color:var(--color-text-muted); flex-shrink:0; }
+  .shift-inline-edit .x{ padding:3px; font-size:14px; flex-shrink:0; }
+  @media (max-width:480px){
+    .shifts-table th, .shifts-table td{ padding:8px 6px; }
+    .shift-chip-text{ max-width:150px; }
+    .shift-inline-edit input[type=text]{ min-width:90px; }
+  }
+
   /* Home */
   .home-greeting h2{ font-size:22px; margin:0 0 4px; }
 
@@ -452,6 +474,19 @@
           <h2 id="homeUpcomingHeading">Up next today</h2>
         </div>
         <div class="home-upcoming-list" id="homeUpcomingList"></div>
+
+        <div class="shifts-dashboard" id="shiftsDashboard">
+          <div class="home-section-head">
+            <h2>This week's shifts</h2>
+          </div>
+          <div class="app-stats" id="shiftsStats"></div>
+          <table class="meal-table shifts-table" id="shiftsTable">
+            <thead>
+              <tr><th style="width:110px;">Day</th><th>Shifts</th></tr>
+            </thead>
+            <tbody id="shiftsTableBody"></tbody>
+          </table>
+        </div>
       </div>
       <div class="home-side">
         <div class="home-card">
@@ -920,6 +955,7 @@
   var appSearchQuery = '';
   var shifts = [];
   var shiftExpandedDay = null;
+  var shiftTableEditing = null;
 
   var grid = document.getElementById('grid');
   var emptyHint = document.getElementById('emptyHint');
@@ -1019,7 +1055,7 @@
     renderBudgetSwitcher();
     renderBudget();
     renderApplications();
-    renderShiftToday();
+    refreshShiftViews();
     initScrollFade();
     initTabs();
   }
@@ -1975,6 +2011,12 @@
     document.getElementById('shiftTodayText').textContent = 'Today: ' + shiftSummaryText(getShiftDay(todayIndex).entries);
   }
 
+  function refreshShiftViews(){
+    renderShiftToday();
+    renderShiftsTable();
+    renderShiftsStats();
+  }
+
   function openShiftPanel(){
     shiftExpandedDay = null;
     renderShiftPanel();
@@ -2036,7 +2078,7 @@
             locInput.addEventListener('change', function(){
               entry.location = locInput.value.trim();
               saveShifts();
-              renderShiftToday();
+              refreshShiftViews();
             });
             topRow.appendChild(locInput);
 
@@ -2049,7 +2091,7 @@
               e.stopPropagation();
               dayEntry.entries = dayEntry.entries.filter(function(_, i){ return i !== idx; });
               saveShifts();
-              renderShiftToday();
+              refreshShiftViews();
               renderShiftPanel();
             });
             topRow.appendChild(removeBtn);
@@ -2065,7 +2107,7 @@
             startInput.addEventListener('change', function(){
               entry.start = startInput.value;
               saveShifts();
-              renderShiftToday();
+              refreshShiftViews();
             });
             timesRow.appendChild(startInput);
 
@@ -2081,7 +2123,7 @@
             endInput.addEventListener('change', function(){
               entry.end = endInput.value;
               saveShifts();
-              renderShiftToday();
+              refreshShiftViews();
             });
             timesRow.appendChild(endInput);
 
@@ -2101,7 +2143,7 @@
             }
             dayEntry.entries.push({ location: '', start: '09:00', end: '17:00' });
             saveShifts();
-            renderShiftToday();
+            refreshShiftViews();
             renderShiftPanel();
           });
           editWrap.appendChild(addBtn);
@@ -2376,6 +2418,215 @@
     renderHomeBudgetCard();
     renderHomeAppsCard();
     renderMiniCal();
+    renderShiftsTable();
+    renderShiftsStats();
+  }
+
+  /* ---------- Shifts dashboard (Home tab) ---------- */
+
+  function shiftStat(container, label, value){
+    var el = document.createElement('div');
+    el.className = 'app-stat';
+    var lbl = document.createElement('span');
+    lbl.textContent = label + ': ';
+    var val = document.createElement('b');
+    val.textContent = value;
+    el.appendChild(lbl);
+    el.appendChild(val);
+    container.appendChild(el);
+  }
+
+  function renderShiftsStats(){
+    var statsEl = document.getElementById('shiftsStats');
+    if(!statsEl) return;
+    statsEl.innerHTML = '';
+
+    var workingDays = 0, totalMinutes = 0;
+    for(var d = 0; d < 7; d++){
+      var day = getShiftDay(d);
+      if(day.entries.length) workingDays++;
+      day.entries.forEach(function(e){
+        totalMinutes += Math.max(0, toMinutes(e.end) - toMinutes(e.start));
+      });
+    }
+    var hoursText = (Math.round((totalMinutes / 60) * 10) / 10) + 'h';
+
+    var todayIndex = getTodayIndex();
+    var now = bostonNow();
+    var nowMin = now.getHours() * 60 + now.getMinutes();
+    var next = null;
+    for(var offset = 0; offset < 7 && !next; offset++){
+      var d2 = (todayIndex + offset) % 7;
+      var day2 = getShiftDay(d2);
+      var candidates = day2.entries.filter(function(e){
+        return offset > 0 || toMinutes(e.start) > nowMin;
+      }).slice().sort(function(a, b){ return toMinutes(a.start) - toMinutes(b.start); });
+      if(candidates.length){ next = { day: d2, entry: candidates[0], isToday: offset === 0 }; }
+    }
+
+    shiftStat(statsEl, 'Working days', workingDays + '/7');
+    shiftStat(statsEl, 'Hours this week', hoursText);
+    shiftStat(statsEl, 'Next shift', next
+      ? (next.isToday ? 'Today' : DAY_NAMES[next.day]) + ' ' + formatShiftTime(next.entry.start)
+      : 'None scheduled');
+  }
+
+  function buildShiftChip(dayEntry, entry, idx, d){
+    var chip = document.createElement('div');
+    chip.className = 'shift-chip';
+
+    var text = document.createElement('button');
+    text.type = 'button';
+    text.className = 'shift-chip-text';
+    text.textContent = (entry.location || 'Untitled') + ' · ' + formatShiftTime(entry.start) + '–' + formatShiftTime(entry.end);
+    text.title = 'Click to edit';
+    text.addEventListener('click', function(){
+      shiftTableEditing = { day: d, idx: idx };
+      renderShiftsTable();
+    });
+    chip.appendChild(text);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'x';
+    removeBtn.setAttribute('aria-label', 'Remove this shift');
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', function(){
+      dayEntry.entries = dayEntry.entries.filter(function(_, i){ return i !== idx; });
+      saveShifts();
+      if(shiftTableEditing && shiftTableEditing.day === d) shiftTableEditing = null;
+      refreshShiftViews();
+    });
+    chip.appendChild(removeBtn);
+
+    return chip;
+  }
+
+  function buildShiftEditor(dayEntry, entry, idx, d){
+    var wrap = document.createElement('div');
+    wrap.className = 'shift-inline-edit';
+
+    var locInput = document.createElement('input');
+    locInput.type = 'text';
+    locInput.value = entry.location;
+    locInput.placeholder = 'Location';
+    locInput.addEventListener('change', function(){
+      entry.location = locInput.value.trim();
+      saveShifts();
+      renderShiftToday();
+      renderShiftsStats();
+    });
+    wrap.appendChild(locInput);
+
+    var startInput = document.createElement('input');
+    startInput.type = 'time';
+    startInput.value = entry.start;
+    startInput.addEventListener('change', function(){
+      entry.start = startInput.value;
+      saveShifts();
+      renderShiftToday();
+      renderShiftsStats();
+    });
+    wrap.appendChild(startInput);
+
+    var sep = document.createElement('span');
+    sep.className = 'shift-time-sep';
+    sep.textContent = 'to';
+    wrap.appendChild(sep);
+
+    var endInput = document.createElement('input');
+    endInput.type = 'time';
+    endInput.value = entry.end;
+    endInput.addEventListener('change', function(){
+      entry.end = endInput.value;
+      saveShifts();
+      renderShiftToday();
+      renderShiftsStats();
+    });
+    wrap.appendChild(endInput);
+
+    var doneBtn = document.createElement('button');
+    doneBtn.type = 'button';
+    doneBtn.className = 'x';
+    doneBtn.setAttribute('aria-label', 'Done editing');
+    doneBtn.textContent = '✓';
+    doneBtn.addEventListener('click', function(){
+      shiftTableEditing = null;
+      renderShiftsTable();
+    });
+    wrap.appendChild(doneBtn);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'x';
+    removeBtn.setAttribute('aria-label', 'Remove this shift');
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', function(){
+      dayEntry.entries = dayEntry.entries.filter(function(_, i){ return i !== idx; });
+      saveShifts();
+      shiftTableEditing = null;
+      refreshShiftViews();
+    });
+    wrap.appendChild(removeBtn);
+
+    return wrap;
+  }
+
+  function renderShiftsTable(){
+    var body = document.getElementById('shiftsTableBody');
+    if(!body) return;
+    body.innerHTML = '';
+    var todayIndex = getTodayIndex();
+
+    for(var d = 0; d < 7; d++){
+      (function(d){
+        var dayEntry = getShiftDay(d);
+        var tr = document.createElement('tr');
+        tr.className = d === todayIndex ? 'today-row' : '';
+
+        var dayTd = document.createElement('td');
+        dayTd.className = 'day-cell';
+        dayTd.textContent = DAY_NAMES_FULL[d];
+        tr.appendChild(dayTd);
+
+        var entriesTd = document.createElement('td');
+        var cell = document.createElement('div');
+        cell.className = 'shifts-entries-cell';
+
+        if(dayEntry.entries.length === 0){
+          var off = document.createElement('span');
+          off.className = 'shift-off-label';
+          off.textContent = 'Off';
+          cell.appendChild(off);
+        }
+
+        dayEntry.entries.forEach(function(entry, idx){
+          var isEditing = shiftTableEditing && shiftTableEditing.day === d && shiftTableEditing.idx === idx;
+          cell.appendChild(isEditing ? buildShiftEditor(dayEntry, entry, idx, d) : buildShiftChip(dayEntry, entry, idx, d));
+        });
+
+        var addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'meal-add-btn';
+        addBtn.setAttribute('aria-label', 'Add shift for ' + DAY_NAMES_FULL[d]);
+        addBtn.textContent = '+';
+        addBtn.addEventListener('click', function(){
+          if(!shifts.some(function(s){ return s.day === d; })){ shifts.push(dayEntry); }
+          dayEntry.entries.push({ location: '', start: '09:00', end: '17:00' });
+          saveShifts();
+          shiftTableEditing = { day: d, idx: dayEntry.entries.length - 1 };
+          refreshShiftViews();
+          var loc = document.querySelector('#shiftsTableBody .shift-inline-edit input[type=text]');
+          if(loc) loc.focus();
+        });
+        cell.appendChild(addBtn);
+
+        entriesTd.appendChild(cell);
+        tr.appendChild(entriesTd);
+
+        body.appendChild(tr);
+      })(d);
+    }
   }
 
   /* ---------- Backup / restore ---------- */
@@ -2427,7 +2678,7 @@
         renderBudgetSwitcher();
         renderBudget();
         renderApplications();
-        renderShiftToday();
+        refreshShiftViews();
       }catch(e){
         alert('That file doesn’t look like a valid Sanj’s Planner backup.');
       }
