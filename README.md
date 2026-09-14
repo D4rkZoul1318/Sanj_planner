@@ -6,20 +6,10 @@ Static site, no build step, no dependencies. Data is saved in the browser via
 
 ## Deploy to Vercel
 
-**Option 1 — CLI (fastest)**
-```
-npm i -g vercel
-cd sanjs-planner
-vercel --prod
-```
-
-**Option 2 — Drag and drop**
-Go to https://vercel.com/new, drag this folder onto the page, deploy.
-
-**Option 3 — GitHub**
-Push this folder to a new GitHub repo, then "Import Project" at
-https://vercel.com/new and point it at the repo. No framework preset needed
-("Other" / static works fine).
+This repo is connected to Vercel via GitHub. Pushes to `main` deploy to
+production (sanjsplanner.vercel.app); pushes to other branches get their
+own preview URL automatically. No framework preset needed ("Other" /
+static works fine).
 
 ## After deploying
 
