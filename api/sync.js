@@ -1,14 +1,14 @@
 // Plain Node serverless function — no npm packages. Talks to the Upstash
-// Redis REST API directly with fetch, using UPSTASH_REDIS_REST_URL and
-// UPSTASH_REDIS_REST_TOKEN as the base URL and Bearer token (the env vars
-// the Vercel Marketplace Upstash integration injects into this project).
+// Redis REST API directly with fetch, using KV_REST_API_URL and
+// KV_REST_API_TOKEN as the base URL and Bearer token — the env var names
+// this project's Upstash Marketplace integration actually created.
 //
 // GET  /api/sync?code=XXXX        -> { updatedAt, data } for that passcode, or {} if unset
 // POST /api/sync?code=XXXX  {..}  -> stores the posted JSON body under that passcode
 
 module.exports = async function handler(req, res) {
-  const kvUrl = process.env.UPSTASH_REDIS_REST_URL;
-  const kvToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const kvUrl = process.env.KV_REST_API_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN;
 
   if (!kvUrl || !kvToken) {
     res.status(500).json({ error: 'KV is not configured for this project.' });
