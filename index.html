@@ -265,6 +265,31 @@
     .app-next{ text-align:left; max-width:none; }
   }
 
+  /* Shifts */
+  .shift-widget{ position:relative; display:inline-block; margin-top:12px; }
+  .shift-today-btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; background:var(--color-surface); border:1px solid var(--color-border); font-size:13px; font-weight:600; color:var(--color-text); cursor:pointer; max-width:100%; box-shadow:0 1px 3px rgba(24,24,27,0.05); transition:border-color 150ms ease-out, transform 150ms ease-out; }
+  .shift-today-btn:hover{ border-color:var(--color-accent); }
+  .shift-today-btn:active{ transform:scale(0.98); }
+  .shift-today-btn svg{ width:15px; height:15px; color:var(--color-accent); flex-shrink:0; }
+  .shift-today-btn span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .shift-panel{ position:absolute; top:calc(100% + 8px); left:0; z-index:20; width:320px; max-width:calc(100vw - 32px); background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); box-shadow:0 8px 24px rgba(24,24,27,0.14); padding:8px; opacity:0; transform-origin:top left; transform:translateY(-6px) scale(0.98); pointer-events:none; transition:opacity 150ms ease-out, transform 150ms ease-out; }
+  .shift-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .shift-day-row{ border-radius:8px; padding:8px 10px; border-left:3px solid transparent; transition:background-color 120ms ease-out; }
+  .shift-day-row:hover{ background:var(--color-bg); }
+  .shift-day-row.today{ border-left-color:var(--color-accent); background:var(--color-bg); }
+  .shift-day-head{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+  .shift-day-name{ font-weight:700; font-size:13px; color:var(--color-text); }
+  .shift-day-name.today-label{ color:var(--color-accent); }
+  .shift-day-summary{ font-size:12px; color:var(--color-text-muted); margin-top:2px; }
+  .shift-edit{ margin-top:6px; }
+  .shift-entry-row{ margin-top:6px; padding:8px; border:1px solid var(--color-border); border-radius:8px; background:var(--color-bg); }
+  .shift-entry-top{ display:flex; align-items:center; gap:6px; }
+  .shift-entry-top input[type=text]{ flex:1; min-width:0; padding:5px 7px; border:1px solid var(--color-border); border-radius:6px; font-size:12px; background:var(--color-surface); }
+  .shift-entry-times{ display:flex; align-items:center; gap:6px; margin-top:6px; }
+  .shift-entry-times input[type=time]{ flex:1; min-width:0; padding:5px 4px; border:1px solid var(--color-border); border-radius:6px; font-size:12px; background:var(--color-surface); }
+  .shift-entry-times .shift-time-sep{ font-size:11px; color:var(--color-text-muted); flex-shrink:0; }
+  .shift-add-entry-btn{ margin-top:4px; }
+
   /* Home */
   .home-greeting h2{ font-size:22px; margin:0 0 4px; }
 
@@ -367,6 +392,15 @@
   <header>
     <h1 class="ephesis-regular">Sanj's Planner</h1>
     <p class="sub">College classes, work shifts, and personal routine, one week at a glance.</p>
+    <div class="shift-widget">
+      <button type="button" class="shift-today-btn" id="shiftTodayBtn" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span id="shiftTodayText">Today: —</span>
+      </button>
+      <div class="shift-panel" id="shiftPanel">
+        <div class="shift-panel-list" id="shiftPanelList"></div>
+      </div>
+    </div>
   </header>
 
   <div class="tab-nav" role="tablist">
@@ -709,6 +743,7 @@
   var BUDGET_KEY = 'weekly-schedule-budget-v1';
   var ACTIVE_BUDGET_KEY = 'weekly-schedule-active-budget-v1';
   var APPLICATIONS_KEY = 'weekly-schedule-applications-v1';
+  var SHIFTS_KEY = 'weekly-schedule-shifts-v1';
 
   var APP_STATUSES = ['Applied','OA / Assessment','Interviewing','Offer','Rejected','Ghosted'];
   var APP_STATUS_CLASS = {
@@ -831,6 +866,16 @@
     { day:6, toMake:0, lunch:'', dinner:'' }
   ];
 
+  var DEFAULT_SHIFTS = [
+    { day:0, entries:[ { location:'Kitchen', start:'08:00', end:'11:30' } ] },
+    { day:1, entries:[] },
+    { day:2, entries:[ { location:'Carney Cafe', start:'10:00', end:'13:00' }, { location:'Post&Bean Cafe', start:'14:00', end:'17:30' } ] },
+    { day:3, entries:[] },
+    { day:4, entries:[ { location:'Kitchen', start:'08:00', end:'11:30' }, { location:'Grab&Go', start:'13:00', end:'16:30' } ] },
+    { day:5, entries:[] },
+    { day:6, entries:[] }
+  ];
+
   function migrateMealNotes(entry){
     if(entry.lunch != null || entry.dinner != null) return entry;
     var notes = entry.notes || '';
@@ -861,6 +906,8 @@
   var appStatusFilter = 'all';
   var appSortMode = 'newest';
   var appSearchQuery = '';
+  var shifts = [];
+  var shiftExpandedDay = null;
 
   var grid = document.getElementById('grid');
   var emptyHint = document.getElementById('emptyHint');
@@ -944,12 +991,23 @@
     var rawApplications = await storageGet(APPLICATIONS_KEY);
     applications = rawApplications ? JSON.parse(rawApplications) : [];
 
+    var rawShifts = await storageGet(SHIFTS_KEY);
+    if(rawShifts){
+      shifts = JSON.parse(rawShifts);
+    }else{
+      shifts = DEFAULT_SHIFTS.map(function(d){
+        return { day: d.day, entries: d.entries.map(function(e){ return Object.assign({}, e); }) };
+      });
+      await storageSet(SHIFTS_KEY, JSON.stringify(shifts));
+    }
+
     renderGrid();
     renderFlex();
     renderMeals();
     renderBudgetSwitcher();
     renderBudget();
     renderApplications();
+    renderShiftToday();
     initScrollFade();
     initTabs();
   }
@@ -1086,6 +1144,7 @@
     closeModal();
     closeBudgetNameModal();
     closeAppModal();
+    closeShiftPanel();
   });
 
   document.getElementById('resetBtn').addEventListener('click', function(){
@@ -1868,6 +1927,197 @@
     });
   }
 
+  /* ---------- Shifts ---------- */
+
+  var shiftTodayBtn = document.getElementById('shiftTodayBtn');
+  var shiftPanel = document.getElementById('shiftPanel');
+  var shiftPanelList = document.getElementById('shiftPanelList');
+
+  function saveShifts(){
+    storageSet(SHIFTS_KEY, JSON.stringify(shifts));
+  }
+
+  function formatShiftTime(t){
+    var parts = t.split(':');
+    var h = Number(parts[0]);
+    var period = h < 12 ? 'am' : 'pm';
+    var h12 = h % 12;
+    if(h12 === 0) h12 = 12;
+    return h12 + ':' + parts[1] + period;
+  }
+
+  function getShiftDay(dayIndex){
+    return shifts.find(function(s){ return s.day === dayIndex; }) || { day: dayIndex, entries: [] };
+  }
+
+  function shiftSummaryText(entries){
+    if(!entries || entries.length === 0) return 'Off';
+    return entries.map(function(e){
+      return (e.location || 'Untitled') + ' ' + formatShiftTime(e.start) + '–' + formatShiftTime(e.end);
+    }).join(', ');
+  }
+
+  function renderShiftToday(){
+    var todayIndex = getTodayIndex();
+    document.getElementById('shiftTodayText').textContent = 'Today: ' + shiftSummaryText(getShiftDay(todayIndex).entries);
+  }
+
+  function openShiftPanel(){
+    shiftExpandedDay = null;
+    renderShiftPanel();
+    shiftPanel.classList.add('open');
+    shiftTodayBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeShiftPanel(){
+    shiftPanel.classList.remove('open');
+    shiftTodayBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function renderShiftPanel(){
+    shiftPanelList.innerHTML = '';
+    var todayIndex = getTodayIndex();
+    for(var d = 0; d < 7; d++){
+      (function(d){
+        var dayEntry = getShiftDay(d);
+        var row = document.createElement('div');
+        row.className = 'shift-day-row' + (d === todayIndex ? ' today' : '');
+
+        var head = document.createElement('div');
+        head.className = 'shift-day-head';
+        head.setAttribute('role', 'button');
+        head.tabIndex = 0;
+
+        var nameEl = document.createElement('span');
+        nameEl.className = 'shift-day-name' + (d === todayIndex ? ' today-label' : '');
+        nameEl.textContent = DAY_NAMES_FULL[d];
+        head.appendChild(nameEl);
+
+        function toggleExpand(){
+          shiftExpandedDay = (shiftExpandedDay === d) ? null : d;
+          renderShiftPanel();
+        }
+        head.addEventListener('click', function(e){ e.stopPropagation(); toggleExpand(); });
+        head.addEventListener('keydown', function(e){
+          if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleExpand(); }
+        });
+
+        row.appendChild(head);
+
+        if(shiftExpandedDay === d){
+          var editWrap = document.createElement('div');
+          editWrap.className = 'shift-edit';
+
+          dayEntry.entries.forEach(function(entry, idx){
+            var entryRow = document.createElement('div');
+            entryRow.className = 'shift-entry-row';
+
+            var topRow = document.createElement('div');
+            topRow.className = 'shift-entry-top';
+
+            var locInput = document.createElement('input');
+            locInput.type = 'text';
+            locInput.value = entry.location;
+            locInput.placeholder = 'Location';
+            locInput.addEventListener('click', function(e){ e.stopPropagation(); });
+            locInput.addEventListener('change', function(){
+              entry.location = locInput.value.trim();
+              saveShifts();
+              renderShiftToday();
+            });
+            topRow.appendChild(locInput);
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'x';
+            removeBtn.textContent = '×';
+            removeBtn.setAttribute('aria-label', 'Remove this shift');
+            removeBtn.addEventListener('click', function(e){
+              e.stopPropagation();
+              dayEntry.entries = dayEntry.entries.filter(function(_, i){ return i !== idx; });
+              saveShifts();
+              renderShiftToday();
+              renderShiftPanel();
+            });
+            topRow.appendChild(removeBtn);
+            entryRow.appendChild(topRow);
+
+            var timesRow = document.createElement('div');
+            timesRow.className = 'shift-entry-times';
+
+            var startInput = document.createElement('input');
+            startInput.type = 'time';
+            startInput.value = entry.start;
+            startInput.addEventListener('click', function(e){ e.stopPropagation(); });
+            startInput.addEventListener('change', function(){
+              entry.start = startInput.value;
+              saveShifts();
+              renderShiftToday();
+            });
+            timesRow.appendChild(startInput);
+
+            var sep = document.createElement('span');
+            sep.className = 'shift-time-sep';
+            sep.textContent = 'to';
+            timesRow.appendChild(sep);
+
+            var endInput = document.createElement('input');
+            endInput.type = 'time';
+            endInput.value = entry.end;
+            endInput.addEventListener('click', function(e){ e.stopPropagation(); });
+            endInput.addEventListener('change', function(){
+              entry.end = endInput.value;
+              saveShifts();
+              renderShiftToday();
+            });
+            timesRow.appendChild(endInput);
+
+            entryRow.appendChild(timesRow);
+
+            editWrap.appendChild(entryRow);
+          });
+
+          var addBtn = document.createElement('button');
+          addBtn.type = 'button';
+          addBtn.className = 'btn btn-ghost btn-sm shift-add-entry-btn';
+          addBtn.textContent = '+ Add shift';
+          addBtn.addEventListener('click', function(e){
+            e.stopPropagation();
+            if(!shifts.some(function(s){ return s.day === d; })){
+              shifts.push(dayEntry);
+            }
+            dayEntry.entries.push({ location: '', start: '09:00', end: '17:00' });
+            saveShifts();
+            renderShiftToday();
+            renderShiftPanel();
+          });
+          editWrap.appendChild(addBtn);
+
+          row.appendChild(editWrap);
+        }else{
+          var summary = document.createElement('div');
+          summary.className = 'shift-day-summary';
+          summary.textContent = shiftSummaryText(dayEntry.entries);
+          row.appendChild(summary);
+        }
+
+        shiftPanelList.appendChild(row);
+      })(d);
+    }
+  }
+
+  shiftTodayBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(shiftPanel.classList.contains('open')) closeShiftPanel();
+    else openShiftPanel();
+  });
+
+  document.addEventListener('click', function(e){
+    if(!shiftPanel.classList.contains('open')) return;
+    if(shiftPanel.contains(e.target) || shiftTodayBtn.contains(e.target)) return;
+    closeShiftPanel();
+  });
+
   /* ---------- Home ---------- */
 
   var CATEGORY_LABEL = { college:'College', personal:'Personal', other:'Work / other' };
@@ -2118,7 +2368,7 @@
   /* ---------- Backup / restore ---------- */
 
   document.getElementById('exportBtn').addEventListener('click', function(){
-    var payload = { events: events, flexItems: flexItems, meals: meals, budgets: budgets, activeBudgetId: activeBudgetId, applications: applications, exportedAt: new Date().toISOString() };
+    var payload = { events: events, flexItems: flexItems, meals: meals, budgets: budgets, activeBudgetId: activeBudgetId, applications: applications, shifts: shifts, exportedAt: new Date().toISOString() };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -2150,18 +2400,21 @@
         budgets = (importedBudgets && importedBudgets.length) ? importedBudgets : [{ id: uid(), name: 'My Budget', categories: [] }];
         activeBudgetId = (data.activeBudgetId && budgets.some(function(b){ return b.id === data.activeBudgetId; })) ? data.activeBudgetId : budgets[0].id;
         applications = Array.isArray(data.applications) ? data.applications : [];
+        shifts = Array.isArray(data.shifts) ? data.shifts : shifts;
         storageSet(EVENTS_KEY, JSON.stringify(events));
         storageSet(FLEX_KEY, JSON.stringify(flexItems));
         storageSet(MEALS_KEY, JSON.stringify(meals));
         storageSet(BUDGET_KEY, JSON.stringify(budgets));
         storageSet(ACTIVE_BUDGET_KEY, activeBudgetId);
         storageSet(APPLICATIONS_KEY, JSON.stringify(applications));
+        storageSet(SHIFTS_KEY, JSON.stringify(shifts));
         renderGrid();
         renderFlex();
         renderMeals();
         renderBudgetSwitcher();
         renderBudget();
         renderApplications();
+        renderShiftToday();
       }catch(e){
         alert('That file doesn’t look like a valid Sanj’s Planner backup.');
       }
