@@ -424,6 +424,20 @@
   .backup-icon-btn:active{ transform:scale(0.93); }
   .backup-icon-btn svg{ width:16px; height:16px; }
 
+  /* Sync status (header) */
+  .sync-status{ display:inline-flex; align-items:center; gap:6px; margin-left:10px; padding:0 2px; font-size:12px; font-weight:600; color:var(--color-text-muted); vertical-align:middle; }
+  .sync-status::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--color-text-muted); flex-shrink:0; }
+  .sync-status.synced::before{ background:#059669; }
+  .sync-status.syncing::before{ background:#d97706; animation:syncPulse 1s ease-in-out infinite; }
+  .sync-status.offline::before{ background:#dc2626; }
+  @keyframes syncPulse{
+    0%, 100%{ opacity:1; }
+    50%{ opacity:0.4; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sync-status.syncing::before{ animation:none; }
+  }
+
   /* Saved toast */
   .saved-toast{
     position:fixed;
@@ -509,6 +523,7 @@
       </button>
       <input type="file" id="headerImportFile" accept="application/json" style="display:none;" />
     </div>
+    <span class="sync-status" id="syncStatus">Syncing…</span>
   </header>
 
   <div class="tab-nav" role="tablist">
@@ -702,6 +717,22 @@
 
 <div class="saved-toast" id="savedToast" role="status" aria-live="polite">Saved</div>
 
+<div class="overlay" id="syncCodeOverlay">
+  <div class="modal">
+    <h2>Sync this planner</h2>
+    <p class="hint" style="margin:0 0 14px;">Create a passcode to sync your data across devices, or enter one from another device to restore it here.</p>
+    <div class="field">
+      <label for="f-sync-code">Passcode</label>
+      <input type="text" id="f-sync-code" placeholder="e.g. sanj-week42" autocomplete="off" />
+    </div>
+    <p class="error" id="syncCodeError"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="syncGenerateBtn">Generate new</button>
+      <button type="button" class="btn btn-primary" id="syncCodeContinueBtn">Continue</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="modal">
     <h2 id="modalTitle">Add time block</h2>
@@ -888,6 +919,9 @@
     EVENTS_KEY, SEEDED_KEY, FLEX_KEY, MEALS_KEY, LAST_CATEGORY_KEY,
     BUDGET_KEY, ACTIVE_BUDGET_KEY, APPLICATIONS_KEY, SHIFTS_KEY
   ];
+  var SYNC_CODE_KEY = 'weekly-schedule-sync-code-v1';
+  var SYNC_META_KEY = 'weekly-schedule-sync-meta-v1';
+  var SYNC_DEBOUNCE_MS = 2000;
   var appReady = false;
 
   var BOSTON_TZ = 'America/New_York';
@@ -1078,8 +1112,28 @@
   function storageSet(key, value){
     try{
       localStorage.setItem(key, value);
-      if(appReady) showSavedToast();
+      if(appReady){
+        showSavedToast();
+        scheduleSyncPush();
+      }
     }catch(e){ console.error('Save failed for', key, e); }
+  }
+
+  function dumpAllData(){
+    var payload = {};
+    ALL_STORAGE_KEYS.forEach(function(key){
+      var val = storageGet(key);
+      if(val !== null) payload[key] = val;
+    });
+    return payload;
+  }
+
+  function applyAllData(data){
+    ALL_STORAGE_KEYS.forEach(function(key){
+      if(Object.prototype.hasOwnProperty.call(data, key)){
+        localStorage.setItem(key, data[key]);
+      }
+    });
   }
 
   var savedToastEl = document.getElementById('savedToast');
@@ -1162,6 +1216,7 @@
     initScrollFade();
     initTabs();
     appReady = true;
+    initSync();
   }
 
   function scrollToNow(){
@@ -1297,6 +1352,7 @@
     closeBudgetNameModal();
     closeAppModal();
     closeShiftPanel();
+    closeSyncCodeModal();
   });
 
   document.getElementById('resetBtn').addEventListener('click', function(){
@@ -2649,11 +2705,7 @@
   /* ---------- Backup / restore ---------- */
 
   function exportBackup(){
-    var payload = {};
-    ALL_STORAGE_KEYS.forEach(function(key){
-      var val = storageGet(key);
-      if(val !== null) payload[key] = val;
-    });
+    var payload = dumpAllData();
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -2676,11 +2728,7 @@
         });
         if(!hasAnyKey){ throw new Error('No recognized keys'); }
         if(!confirm('This will replace your current data. Continue?')) return;
-        ALL_STORAGE_KEYS.forEach(function(key){
-          if(Object.prototype.hasOwnProperty.call(data, key)){
-            localStorage.setItem(key, data[key]);
-          }
-        });
+        applyAllData(data);
         location.reload();
       }catch(e){
         alert('That file doesn’t look like a valid Sanj’s Planner backup.');
@@ -2696,6 +2744,124 @@
     importBackup(headerImportFile.files[0]);
     headerImportFile.value = '';
   });
+
+  /* ---------- Cloud sync (Vercel KV, via passcode) ---------- */
+
+  var syncStatusEl = document.getElementById('syncStatus');
+  function setSyncStatus(state, label){
+    if(!syncStatusEl) return;
+    syncStatusEl.className = 'sync-status ' + state;
+    syncStatusEl.textContent = label;
+  }
+
+  var syncPushTimer = null;
+  function scheduleSyncPush(){
+    var code = storageGet(SYNC_CODE_KEY);
+    if(!code) return;
+    localStorage.setItem(SYNC_META_KEY, JSON.stringify({ updatedAt: Date.now() }));
+    setSyncStatus('syncing', 'Syncing…');
+    clearTimeout(syncPushTimer);
+    syncPushTimer = setTimeout(pushSyncNow, SYNC_DEBOUNCE_MS);
+  }
+
+  function pushSyncNow(){
+    var code = storageGet(SYNC_CODE_KEY);
+    if(!code) return;
+    var meta = {};
+    try{ meta = JSON.parse(storageGet(SYNC_META_KEY) || '{}'); }catch(e){ meta = {}; }
+    var payload = { updatedAt: meta.updatedAt || Date.now(), data: dumpAllData() };
+    setSyncStatus('syncing', 'Syncing…');
+    fetch('/api/sync?code=' + encodeURIComponent(code), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(r){
+      if(!r.ok) throw new Error('sync push failed');
+      setSyncStatus('synced', 'Synced');
+    }).catch(function(){
+      setSyncStatus('offline', 'Offline — saved locally');
+    });
+  }
+
+  function pullSyncOnce(code){
+    setSyncStatus('syncing', 'Syncing…');
+    fetch('/api/sync?code=' + encodeURIComponent(code))
+      .then(function(r){
+        if(!r.ok) throw new Error('sync pull failed');
+        return r.json();
+      })
+      .then(function(remote){
+        var localMeta = {};
+        try{ localMeta = JSON.parse(storageGet(SYNC_META_KEY) || '{}'); }catch(e){ localMeta = {}; }
+        var localUpdatedAt = localMeta.updatedAt || 0;
+        var remoteUpdatedAt = (remote && typeof remote.updatedAt === 'number') ? remote.updatedAt : 0;
+        var remoteHasData = !!(remote && remote.data);
+
+        if(remoteHasData && remoteUpdatedAt > localUpdatedAt){
+          applyAllData(remote.data);
+          localStorage.setItem(SYNC_META_KEY, JSON.stringify({ updatedAt: remoteUpdatedAt }));
+          setSyncStatus('synced', 'Synced');
+          location.reload();
+          return;
+        }
+
+        setSyncStatus('synced', 'Synced');
+        if(!remoteHasData || localUpdatedAt > remoteUpdatedAt){
+          pushSyncNow();
+        }
+      })
+      .catch(function(){
+        setSyncStatus('offline', 'Offline — saved locally');
+      });
+  }
+
+  var syncCodeOverlay = document.getElementById('syncCodeOverlay');
+  var syncCodeInput = document.getElementById('f-sync-code');
+  var syncCodeError = document.getElementById('syncCodeError');
+
+  function randomSyncCode(){
+    return Math.random().toString(36).slice(2, 8);
+  }
+
+  function promptForSyncCode(){
+    setSyncStatus('offline', 'Not synced yet');
+    syncCodeError.classList.remove('show');
+    syncCodeInput.value = '';
+    syncCodeOverlay.classList.add('open');
+    setTimeout(function(){ syncCodeInput.focus(); }, 50);
+  }
+
+  function closeSyncCodeModal(){
+    syncCodeOverlay.classList.remove('open');
+  }
+
+  document.getElementById('syncGenerateBtn').addEventListener('click', function(){
+    syncCodeInput.value = randomSyncCode();
+    syncCodeInput.focus();
+  });
+
+  document.getElementById('syncCodeContinueBtn').addEventListener('click', function(){
+    var code = syncCodeInput.value.trim().toLowerCase();
+    if(!code){
+      syncCodeError.textContent = 'Enter a passcode, or tap "Generate new."';
+      syncCodeError.classList.add('show');
+      return;
+    }
+    localStorage.setItem(SYNC_CODE_KEY, code);
+    closeSyncCodeModal();
+    pullSyncOnce(code);
+  });
+
+  syncCodeOverlay.addEventListener('click', function(e){ if(e.target === syncCodeOverlay) closeSyncCodeModal(); });
+
+  function initSync(){
+    var code = storageGet(SYNC_CODE_KEY);
+    if(!code){
+      promptForSyncCode();
+      return;
+    }
+    pullSyncOnce(code);
+  }
 
   loadAll();
 })();
