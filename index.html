@@ -395,6 +395,7 @@
   .upnext-item.src-lunch{ border-left-color:var(--lunch-text); }
   .upnext-item.src-dinner{ border-left-color:var(--dinner-text); }
   .upnext-item.src-application{ border-left-color:var(--acc-apps); }
+  .upnext-item.src-bus{ border-left-color:var(--acc-shift); }
   .upnext-item-label{ font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:2px; }
   .upnext-item-title{ font-weight:700; font-size:14px; }
   .upnext-item-sub{ font-size:12px; color:var(--color-text-muted); margin-top:2px; }
@@ -546,6 +547,10 @@
     <button type="button" class="tab-btn" id="tabBtnApplications" data-tab="applications" role="tab" aria-selected="false" aria-controls="tab-applications">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
       <span>Applications</span>
+    </button>
+    <button type="button" class="tab-btn" id="tabBtnBus" data-tab="bus" role="tab" aria-selected="false" aria-controls="tab-bus">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="14" rx="2"></rect><path d="M4 11h16"></path><circle cx="8" cy="17.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="17.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>
+      <span>Bus</span>
     </button>
   </div>
 
@@ -710,6 +715,25 @@
     </div>
     <div class="app-filters" id="appFilters"></div>
     <div class="app-list" id="appList"></div>
+  </section>
+
+  <section id="tab-bus" class="tab-panel" role="tabpanel" hidden>
+    <h2>Route 31 (PVTA)</h2>
+    <p class="hint">Live departures for the Boulders ↔ UMass Amherst commute.</p>
+    <div class="home-two-col">
+      <div>
+        <div class="home-section-head">
+          <h2>From The Boulders</h2>
+        </div>
+        <div class="home-recent-list" id="busHomeList"></div>
+      </div>
+      <div>
+        <div class="home-section-head">
+          <h2>From Fine Arts Center</h2>
+        </div>
+        <div class="home-recent-list" id="busCampusList"></div>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -923,6 +947,14 @@
   var SYNC_META_KEY = 'weekly-schedule-sync-meta-v1';
   var SYNC_DEBOUNCE_MS = 2000;
   var appReady = false;
+
+  var BUS_ROUTE_ID = 'PVTAMA:116200';
+  var BUS_STOP_HOME = 'PVTAMA:23184';
+  var BUS_STOP_CAMPUS = 'PVTAMA:23222';
+  var BUS_DIR_TO_CAMPUS = 0;
+  var BUS_DIR_TO_HOME = 1;
+  var BUS_REFRESH_MS = 60000;
+  var nextBusToCampus = null;
 
   var BOSTON_TZ = 'America/New_York';
   function bostonNow(){
@@ -1217,6 +1249,8 @@
     initTabs();
     appReady = true;
     initSync();
+    fetchNextBus();
+    setInterval(fetchNextBus, BUS_REFRESH_MS);
   }
 
   function scrollToNow(){
@@ -1249,7 +1283,8 @@
       schedule: document.getElementById('tab-schedule'),
       meals: document.getElementById('tab-meals'),
       budget: document.getElementById('tab-budget'),
-      applications: document.getElementById('tab-applications')
+      applications: document.getElementById('tab-applications'),
+      bus: document.getElementById('tab-bus')
     };
     function showTab(name){
       buttons.forEach(function(btn){
@@ -1263,6 +1298,7 @@
       if(name === 'home') renderHome();
       if(name === 'schedule') scrollToNow();
       if(name === 'meals') renderMeals();
+      if(name === 'bus') renderBusTab();
     }
     buttons.forEach(function(btn){
       btn.addEventListener('click', function(){ showTab(btn.getAttribute('data-tab')); });
@@ -2496,6 +2532,13 @@
       listEl.appendChild(buildUpNextItem('src-schedule', 'Next up', nextEvent.title, nextEvent.start + '–' + nextEvent.end + (nextEvent.loc ? ' · ' + nextEvent.loc : '')));
     }
 
+    if(nextBusToCampus){
+      hasAny = true;
+      var busMins = busMinutesAway(nextBusToCampus.arrival_time);
+      var busSub = (busMins <= 0 ? 'Due now' : 'in ' + busMins + ' min') + (nextBusToCampus.is_real_time ? ' · live' : ' · scheduled');
+      listEl.appendChild(buildUpNextItem('src-bus', 'Route 31 (to campus)', formatBusTime(nextBusToCampus.arrival_time), busSub));
+    }
+
     var mealEntry = meals.find(function(m){ return m.day === todayIndex; });
     if(mealEntry && mealEntry.lunch){
       hasAny = true;
@@ -2861,6 +2904,87 @@
       return;
     }
     pullSyncOnce(code);
+  }
+
+  /* ---------- Bus schedule (Route 31, PVTA) ---------- */
+
+  function formatBusTime(unixSeconds){
+    var d = new Date(unixSeconds * 1000);
+    return d.toLocaleTimeString('en-US', { timeZone: BOSTON_TZ, hour: 'numeric', minute: '2-digit' });
+  }
+
+  function busMinutesAway(unixSeconds){
+    return Math.round(((unixSeconds * 1000) - Date.now()) / 60000);
+  }
+
+  function extractRouteDepartures(data, directionId){
+    if(!data || !Array.isArray(data.route_departures)) return [];
+    var routeEntry = data.route_departures.find(function(r){ return r.global_route_id === BUS_ROUTE_ID; });
+    if(!routeEntry) return [];
+    var itin = routeEntry.merged_itineraries.find(function(m){ return m.direction_id === directionId; });
+    if(!itin) return [];
+    var now = Date.now() / 1000;
+    return itin.schedule_items
+      .filter(function(s){ return !s.is_cancelled && s.arrival_time > now; })
+      .sort(function(a, b){ return a.arrival_time - b.arrival_time; });
+  }
+
+  function fetchBusDepartures(stopId, directionId){
+    return fetch('/api/bus?global_stop_id=' + encodeURIComponent(stopId))
+      .then(function(r){ if(!r.ok) throw new Error('bus fetch failed'); return r.json(); })
+      .then(function(data){ return extractRouteDepartures(data, directionId); })
+      .catch(function(){ return null; });
+  }
+
+  function fetchNextBus(){
+    fetchBusDepartures(BUS_STOP_HOME, BUS_DIR_TO_CAMPUS).then(function(items){
+      nextBusToCampus = (items && items.length) ? items[0] : null;
+      var homeTab = document.getElementById('tab-home');
+      if(homeTab && !homeTab.hidden) renderHomeUpNext();
+    });
+  }
+
+  function renderBusList(container, items, directionLabel){
+    container.innerHTML = '';
+    if(items === null){
+      appendEmptyRow(container, 'Couldn’t load live times right now.');
+      return;
+    }
+    if(items.length === 0){
+      appendEmptyRow(container, 'No more Route 31 buses ' + directionLabel + ' today.');
+      return;
+    }
+    items.slice(0, 5).forEach(function(item){
+      var row = document.createElement('div');
+      row.className = 'recent-app-row';
+      var left = document.createElement('div');
+      var title = document.createElement('div');
+      title.className = 'recent-app-title';
+      title.textContent = formatBusTime(item.arrival_time);
+      var meta = document.createElement('div');
+      meta.className = 'recent-app-meta';
+      var mins = busMinutesAway(item.arrival_time);
+      meta.textContent = (mins <= 0 ? 'Due now' : 'in ' + mins + ' min') + (item.is_real_time ? ' · live' : ' · scheduled');
+      left.appendChild(title);
+      left.appendChild(meta);
+      row.appendChild(left);
+      container.appendChild(row);
+    });
+  }
+
+  function renderBusTab(){
+    var homeListEl = document.getElementById('busHomeList');
+    var campusListEl = document.getElementById('busCampusList');
+    if(!homeListEl || !campusListEl) return;
+    homeListEl.innerHTML = '<div class="app-empty">Loading…</div>';
+    campusListEl.innerHTML = '<div class="app-empty">Loading…</div>';
+
+    fetchBusDepartures(BUS_STOP_HOME, BUS_DIR_TO_CAMPUS).then(function(items){
+      renderBusList(homeListEl, items, 'toward campus');
+    });
+    fetchBusDepartures(BUS_STOP_CAMPUS, BUS_DIR_TO_HOME).then(function(items){
+      renderBusList(campusListEl, items, 'toward The Boulders');
+    });
   }
 
   loadAll();
