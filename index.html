@@ -3032,7 +3032,7 @@
       appendEmptyRow(container, 'No more Route 31 buses ' + directionLabel + ' today.');
       return;
     }
-    items.slice(0, 5).forEach(function(item){
+    items.forEach(function(item){
       var row = document.createElement('div');
       row.className = 'recent-app-row';
       var left = document.createElement('div');
