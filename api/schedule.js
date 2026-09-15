@@ -1,12 +1,17 @@
-// TEMPORARY discovery proxy for Transitland's v2 REST API, used only while
-// building the full-day bus schedule feature. Generic passthrough so we can
-// try different endpoints/params without redeploying each time — NOT the
-// final shape, will be replaced with a fixed single-purpose proxy before
-// this ships to users (mirrors the pattern in api/bus.js).
+// Plain Node serverless function — no npm packages. Proxies Transitland's v2
+// REST API (https://api.transit.land/api/v2/rest/stops/{stop_key}/departures)
+// to return the FULL DAY's scheduled Route 31 (PVTA) departures for one of
+// our two known stops, filtered down to just what the client needs.
 //
-// GET /api/schedule?path=/stops&feed_onestop_id=f-drk-pvta&stop_id=157
-//
-// (redeployed to pick up TRANSITLAND_API_KEY)
+// GET /api/schedule?stop=home|campus&date=YYYY-MM-DD (date optional, defaults to today)
+// -> { departures: [ { time: "07:20:00", direction_id: 0, headsign: "Sunderland" }, ... ] }
+
+const STOP_KEYS = {
+  home: 's-drs2vt6j4q-thebouldersapts',   // The Boulders Apts
+  campus: 's-drs3jsmwvy-fineartscenter'   // Fine Arts Center
+};
+
+const ROUTE_ONESTOP_ID = 'r-drs3-31'; // Route 31, Sunderland / South Amherst
 
 module.exports = async function handler(req, res) {
   const apiKey = process.env.TRANSITLAND_API_KEY;
@@ -20,31 +25,45 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const rawPath = Array.isArray(req.query.path) ? req.query.path[0] : req.query.path;
-  if (!rawPath || !rawPath.startsWith('/')) {
-    res.status(400).json({ error: 'Missing or invalid "path" query parameter (must start with /).' });
+  const rawStop = Array.isArray(req.query.stop) ? req.query.stop[0] : req.query.stop;
+  const stopKey = STOP_KEYS[rawStop];
+  if (!stopKey) {
+    res.status(400).json({ error: 'Invalid or missing "stop" query parameter. Use "home" or "campus".' });
     return;
   }
 
+  const rawDate = Array.isArray(req.query.date) ? req.query.date[0] : req.query.date;
+  const date = (rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate)) ? rawDate : new Date().toISOString().slice(0, 10);
+
   const params = new URLSearchParams();
-  Object.keys(req.query).forEach(function (key) {
-    if (key === 'path') return;
-    const val = req.query[key];
-    if (Array.isArray(val)) {
-      val.forEach(function (v) { params.append(key, v); });
-    } else {
-      params.set(key, val);
-    }
-  });
+  params.set('date', date);
+  params.set('start_time', '00:00:00');
+  params.set('end_time', '23:59:59');
+  params.set('limit', '300');
 
   try {
-    const upstream = await fetch('https://api.transit.land/api/v2/rest' + rawPath + '?' + params.toString(), {
-      headers: { apikey: apiKey }
-    });
-    const text = await upstream.text();
-    res.status(upstream.status);
-    res.setHeader('Content-Type', 'application/json');
-    res.send(text);
+    const upstream = await fetch(
+      'https://api.transit.land/api/v2/rest/stops/' + encodeURIComponent(stopKey) + '/departures?' + params.toString(),
+      { headers: { apikey: apiKey } }
+    );
+    if (!upstream.ok) {
+      res.status(upstream.status).json({ error: 'Transitland API returned an error.' });
+      return;
+    }
+    const data = await upstream.json();
+    const rawDepartures = (data.stops && data.stops[0] && data.stops[0].departures) || [];
+    const departures = rawDepartures
+      .filter(function (d) { return d.trip && d.trip.route && d.trip.route.onestop_id === ROUTE_ONESTOP_ID; })
+      .map(function (d) {
+        return {
+          time: d.departure_time,
+          direction_id: d.trip.direction_id,
+          headsign: d.trip.trip_headsign
+        };
+      })
+      .sort(function (a, b) { return a.time < b.time ? -1 : a.time > b.time ? 1 : 0; });
+
+    res.status(200).json({ date: date, departures: departures });
   } catch (e) {
     res.status(502).json({ error: 'Transitland API request failed.', message: String((e && e.message) || e) });
   }
