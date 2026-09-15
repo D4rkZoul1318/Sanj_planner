@@ -289,6 +289,12 @@
     .app-next{ text-align:left; max-width:none; }
   }
 
+  /* Amherst clock */
+  .amherst-clock{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; margin-top:12px; margin-left:10px; border-radius:999px; background:var(--color-surface); border:1px solid var(--color-border); font-size:13px; font-weight:600; color:var(--color-text); box-shadow:0 1px 3px rgba(24,24,27,0.05); vertical-align:top; }
+  .amherst-clock svg{ width:15px; height:15px; color:var(--color-accent); flex-shrink:0; }
+  .amherst-clock-time{ font-variant-numeric:tabular-nums; }
+  .amherst-clock-label{ color:var(--color-text-muted); font-weight:500; }
+
   /* Shifts */
   .shift-widget{ position:relative; display:inline-block; margin-top:12px; }
   .shift-today-btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; background:var(--color-surface); border:1px solid var(--color-border); font-size:13px; font-weight:600; color:var(--color-text); cursor:pointer; max-width:100%; box-shadow:0 1px 3px rgba(24,24,27,0.05); transition:border-color 150ms ease-out, transform 150ms ease-out; }
@@ -522,6 +528,11 @@
       <div class="shift-panel" id="shiftPanel">
         <div class="shift-panel-list" id="shiftPanelList"></div>
       </div>
+    </div>
+    <div class="amherst-clock" title="Current time in Amherst, MA">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <span class="amherst-clock-time" id="amherstClockText">--:--:-- --</span>
+      <span class="amherst-clock-label">Amherst</span>
     </div>
     <div class="backup-controls">
       <button type="button" class="backup-icon-btn" id="headerExportBtn" aria-label="Export backup" title="Export backup">
@@ -979,6 +990,19 @@
     return new Date(Number(map.year), Number(map.month) - 1, Number(map.day), hour, Number(map.minute), Number(map.second));
   }
 
+  var amherstClockText = document.getElementById('amherstClockText');
+  function updateAmherstClock(){
+    if(!amherstClockText) return;
+    var now = bostonNow();
+    var h = now.getHours();
+    var period = h < 12 ? 'AM' : 'PM';
+    var h12 = h % 12;
+    if(h12 === 0) h12 = 12;
+    var mm = String(now.getMinutes()).padStart(2, '0');
+    var ss = String(now.getSeconds()).padStart(2, '0');
+    amherstClockText.textContent = h12 + ':' + mm + ':' + ss + ' ' + period;
+  }
+
   function uid(){ return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function toMinutes(t){ var parts = t.split(':'); return Number(parts[0])*60 + Number(parts[1]); }
   function getTodayIndex(){ var d = bostonNow().getDay(); return d === 0 ? 6 : d - 1; }
@@ -1259,6 +1283,13 @@
     initSync();
     fetchNextBus();
     setInterval(fetchNextBus, BUS_REFRESH_MS);
+
+    updateAmherstClock();
+    setInterval(updateAmherstClock, 1000);
+    setInterval(function(){
+      var homeTab = document.getElementById('tab-home');
+      if(homeTab && !homeTab.hidden) renderHome();
+    }, 60000);
   }
 
   function scrollToNow(){
