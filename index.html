@@ -416,7 +416,8 @@
   .upnext-item.src-dinner{ border-left-color:var(--dinner-text); }
   .upnext-item.src-application{ border-left-color:var(--acc-apps); }
   .upnext-item.src-bus{ border-left-color:var(--acc-shift); }
-  .upnext-item-label{ font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:2px; }
+  .upnext-item-label{ display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:2px; }
+  .upnext-item-label svg{ width:13px; height:13px; flex-shrink:0; }
   .upnext-item-title{ font-weight:700; font-size:14px; }
   .upnext-item-sub{ font-size:12px; color:var(--color-text-muted); margin-top:2px; }
 
@@ -2442,6 +2443,13 @@
 
   var CATEGORY_LABEL = { college:'College', personal:'Personal', other:'Work / other' };
 
+  var UPNEXT_ICONS = {
+    'src-schedule': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3"></path><path d="M11 15h9a1 1 0 0 1 1 1v2"></path><path d="M3 18h18"></path></svg>',
+    'src-bus': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="14" rx="2"></rect><path d="M4 11h16"></path><circle cx="8" cy="17.5" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="17.5" r="1.1" fill="currentColor" stroke="none"></circle></svg>',
+    'src-lunch': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2"></path><path d="M4 17a8 8 0 0 1 16 0"></path><path d="M2 17h20"></path></svg>',
+    'src-dinner': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2"></path><path d="M4 17a8 8 0 0 1 16 0"></path><path d="M2 17h20"></path></svg>'
+  };
+
   var selectedDayIndex = getTodayIndex();
   var selectedCalDate = null;
 
@@ -2514,7 +2522,8 @@
     item.className = 'upnext-item ' + cls;
     var labelEl = document.createElement('div');
     labelEl.className = 'upnext-item-label';
-    labelEl.textContent = label;
+    var icon = UPNEXT_ICONS[cls];
+    labelEl.innerHTML = (icon || '') + '<span>' + escapeHtml(label) + '</span>';
     var titleEl = document.createElement('div');
     titleEl.className = 'upnext-item-title';
     titleEl.textContent = title;
