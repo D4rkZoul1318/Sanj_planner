@@ -422,6 +422,9 @@
   .upnext-item-sub{ font-size:12px; color:var(--color-text-muted); margin-top:2px; }
 
   .home-recent-list{ display:flex; flex-direction:column; border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); overflow:hidden; box-shadow:0 1px 3px rgba(24,24,27,0.05); }
+  .bus-fullday-toggle{ margin-top:10px; }
+  .bus-fullday-list{ margin-top:8px; max-height:360px; overflow-y:auto; }
+  .bus-fullday-list[hidden]{ display:none; }
   .recent-app-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--color-border); cursor:pointer; transition:background-color 120ms ease-out; }
   .recent-app-row:last-child{ border-bottom:none; }
   .recent-app-row:hover{ background:var(--color-bg); }
@@ -757,12 +760,16 @@
           <h2>From The Boulders</h2>
         </div>
         <div class="home-recent-list" id="busHomeList"></div>
+        <button type="button" class="btn btn-ghost btn-sm bus-fullday-toggle" id="busHomeFullToggle">Show full-day schedule</button>
+        <div class="home-recent-list bus-fullday-list" id="busHomeFullList" hidden></div>
       </div>
       <div>
         <div class="home-section-head">
           <h2>From Fine Arts Center</h2>
         </div>
         <div class="home-recent-list" id="busCampusList"></div>
+        <button type="button" class="btn btn-ghost btn-sm bus-fullday-toggle" id="busCampusFullToggle">Show full-day schedule</button>
+        <div class="home-recent-list bus-fullday-list" id="busCampusFullList" hidden></div>
       </div>
     </div>
   </section>
@@ -3064,6 +3071,79 @@
       renderBusList(campusListEl, items, 'toward The Boulders');
     });
   }
+
+  /* ---------- Full-day bus schedule (Transitland) ---------- */
+
+  function formatScheduleTime(hms){
+    var parts = hms.split(':');
+    var h = Number(parts[0]);
+    var m = parts[1];
+    var nextDay = h >= 24;
+    if(nextDay) h -= 24;
+    var period = h < 12 ? 'AM' : 'PM';
+    var h12 = h % 12;
+    if(h12 === 0) h12 = 12;
+    return h12 + ':' + m + ' ' + period + (nextDay ? ' (next day)' : '');
+  }
+
+  function fetchFullDaySchedule(stopKey){
+    return fetch('/api/schedule?stop=' + encodeURIComponent(stopKey))
+      .then(function(r){ if(!r.ok) throw new Error('schedule fetch failed'); return r.json(); })
+      .then(function(data){ return Array.isArray(data.departures) ? data.departures : []; })
+      .catch(function(){ return null; });
+  }
+
+  function renderFullDayList(container, departures){
+    container.innerHTML = '';
+    if(departures === null){
+      appendEmptyRow(container, 'Couldn’t load the full schedule right now.');
+      return;
+    }
+    if(departures.length === 0){
+      appendEmptyRow(container, 'No Route 31 trips found for today.');
+      return;
+    }
+    departures.forEach(function(dep){
+      var row = document.createElement('div');
+      row.className = 'recent-app-row';
+      var left = document.createElement('div');
+      var title = document.createElement('div');
+      title.className = 'recent-app-title';
+      title.textContent = formatScheduleTime(dep.time);
+      left.appendChild(title);
+      if(dep.headsign){
+        var meta = document.createElement('div');
+        meta.className = 'recent-app-meta';
+        meta.textContent = dep.headsign;
+        left.appendChild(meta);
+      }
+      row.appendChild(left);
+      container.appendChild(row);
+    });
+  }
+
+  function setupFullDayToggle(toggleBtn, listEl, stopKey){
+    var loaded = false;
+    toggleBtn.addEventListener('click', function(){
+      if(listEl.hidden){
+        listEl.hidden = false;
+        toggleBtn.textContent = 'Hide full-day schedule';
+        if(!loaded){
+          listEl.innerHTML = '<div class="app-empty">Loading…</div>';
+          fetchFullDaySchedule(stopKey).then(function(departures){
+            loaded = true;
+            renderFullDayList(listEl, departures);
+          });
+        }
+      }else{
+        listEl.hidden = true;
+        toggleBtn.textContent = 'Show full-day schedule';
+      }
+    });
+  }
+
+  setupFullDayToggle(document.getElementById('busHomeFullToggle'), document.getElementById('busHomeFullList'), 'home');
+  setupFullDayToggle(document.getElementById('busCampusFullToggle'), document.getElementById('busCampusFullList'), 'campus');
 
   loadAll();
 })();
