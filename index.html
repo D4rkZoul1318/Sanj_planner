@@ -64,7 +64,11 @@
     color:var(--color-text);
     padding:24px 16px 96px;
   }
-  .wrap{ max-width:1100px; margin:0 auto; }
+  .wrap{ max-width:1100px; margin:0 auto; position:relative; }
+  .settings-btn{ position:absolute; top:0; right:0; width:36px; height:36px; border-radius:50%; border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; }
+  .settings-btn:hover{ border-color:var(--color-accent); color:var(--color-accent); }
+  .settings-btn:active{ transform:scale(0.93); }
+  .settings-btn svg{ width:18px; height:18px; }
   h1{ font-size:44px; font-weight:800; letter-spacing:-0.02em; margin:0 0 4px; }
   h2{ font-size:16px; font-weight:800; letter-spacing:-0.01em; margin:0 0 10px; }
   .sub{ color:var(--color-text-muted); font-size:14px; margin:0; }
@@ -503,6 +507,9 @@
 </head>
 <body>
 <div class="wrap">
+  <button type="button" class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+  </button>
   <header>
     <h1 class="ephesis-regular">Sanj's Planner</h1>
     <p class="sub">College classes, work shifts, and personal routine, one week at a glance.</p>
@@ -743,8 +750,8 @@
 
 <div class="overlay" id="syncCodeOverlay">
   <div class="modal">
-    <h2>Sync this planner</h2>
-    <p class="hint" style="margin:0 0 14px;">Create a passcode to sync your data across devices, or enter one from another device to restore it here.</p>
+    <h2 id="syncModalTitle">Sync this planner</h2>
+    <p class="hint" id="syncModalHint" style="margin:0 0 14px;">Create a passcode to sync your data across devices, or enter one from another device to restore it here.</p>
     <div class="field">
       <label for="f-sync-code">Passcode</label>
       <input type="text" id="f-sync-code" placeholder="e.g. sanj-week42" autocomplete="off" />
@@ -2861,6 +2868,8 @@
   var syncCodeOverlay = document.getElementById('syncCodeOverlay');
   var syncCodeInput = document.getElementById('f-sync-code');
   var syncCodeError = document.getElementById('syncCodeError');
+  var syncModalTitle = document.getElementById('syncModalTitle');
+  var syncModalHint = document.getElementById('syncModalHint');
 
   function randomSyncCode(){
     return Math.random().toString(36).slice(2, 8);
@@ -2868,11 +2877,27 @@
 
   function promptForSyncCode(){
     setSyncStatus('offline', 'Not synced yet');
+    syncModalTitle.textContent = 'Sync this planner';
+    syncModalHint.textContent = 'Create a passcode to sync your data across devices, or enter one from another device to restore it here.';
     syncCodeError.classList.remove('show');
     syncCodeInput.value = '';
     syncCodeOverlay.classList.add('open');
     setTimeout(function(){ syncCodeInput.focus(); }, 50);
   }
+
+  function openChangePasscodeModal(){
+    var current = storageGet(SYNC_CODE_KEY);
+    syncModalTitle.textContent = 'Change sync passcode';
+    syncModalHint.textContent = current
+      ? 'Current passcode: ' + current + '. Enter a new one to switch to it, or the same passcode used on another device to restore its data here.'
+      : 'Create a passcode to sync your data across devices, or enter one from another device to restore it here.';
+    syncCodeError.classList.remove('show');
+    syncCodeInput.value = '';
+    syncCodeOverlay.classList.add('open');
+    setTimeout(function(){ syncCodeInput.focus(); }, 50);
+  }
+
+  document.getElementById('settingsBtn').addEventListener('click', openChangePasscodeModal);
 
   function closeSyncCodeModal(){
     syncCodeOverlay.classList.remove('open');
