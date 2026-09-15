@@ -5,6 +5,8 @@
 // this ships to users (mirrors the pattern in api/bus.js).
 //
 // GET /api/schedule?path=/stops&feed_onestop_id=f-drk-pvta&stop_id=157
+//
+// (redeployed to pick up TRANSITLAND_API_KEY)
 
 module.exports = async function handler(req, res) {
   const apiKey = process.env.TRANSITLAND_API_KEY;
