@@ -83,7 +83,7 @@
       --acc-schedule-bg 2s ease, --acc-schedule 2s ease,
       --acc-budget-bg 2s ease, --acc-budget 2s ease,
       --acc-apps-bg 2s ease, --acc-apps 2s ease,
-      --half-line-color 2s ease, --danger-hover-bg 2s ease, --text-halo 2s ease;
+      --half-line-color 2s ease, --danger-hover-bg 2s ease;
   }
   .wrap{ max-width:1100px; margin:0 auto; position:relative; }
   .header-top-right{ position:absolute; top:0; right:0; display:flex; align-items:center; gap:10px; }
@@ -595,7 +595,6 @@
   @property --acc-apps{ syntax:'<color>'; inherits:true; initial-value:#059669; }
   @property --half-line-color{ syntax:'<color>'; inherits:true; initial-value:#f0f0f1; }
   @property --danger-hover-bg{ syntax:'<color>'; inherits:true; initial-value:#fef2f2; }
-  @property --text-halo{ syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,0.92); }
 
   :root{
     --surface-blur: none;
@@ -658,7 +657,6 @@
     --acc-apps: #6ee7b7;
     --half-line-color: rgba(255,255,255,0.08);
     --danger-hover-bg: rgba(220,38,38,0.16);
-    --text-halo: rgba(0,0,0,0.8);
     --surface-blur: blur(20px) saturate(160%);
     --fade-rgb: 20,20,24;
   }
@@ -706,27 +704,6 @@
 
   @media (prefers-reduced-motion: reduce){
     .theme-toggle-btn svg{ transition:opacity 150ms ease; transform:none !important; }
-  }
-
-  /* A few pieces of tertiary text (header subtitle, hints, the sync
-     status line) sit directly on the transparent body — i.e. right on
-     the sky — rather than inside a card, and --color-text-muted is a
-     fixed mid-grey in each theme that can't hold contrast against a sky
-     that continuously drifts across the whole light-dark range (worse
-     once the manual toggle pins light/dark independent of what the sky
-     is actually doing). This is a plain diffuse glow, not a boxed
-     container: several soft, wide, layered shadows in a near-opaque
-     halo color let the blur from neighboring letters overlap and cover
-     the gaps between them, instead of just outlining each glyph. */
-  .sub, .hint, .home-date, .sync-status{
-    text-shadow:
-      0 0 2px var(--text-halo), 0 0 5px var(--text-halo),
-      0 0 9px var(--text-halo), 0 0 14px var(--text-halo);
-  }
-  /* ...except inside a modal, which already sits on its own opaque/glass
-     surface, so the glow is redundant there. */
-  .modal .hint{
-    text-shadow:none;
   }
 
   /* Accessibility: reduce transparency — drop the glass blur, dark
