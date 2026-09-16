@@ -83,7 +83,7 @@
       --acc-schedule-bg 2s ease, --acc-schedule 2s ease,
       --acc-budget-bg 2s ease, --acc-budget 2s ease,
       --acc-apps-bg 2s ease, --acc-apps 2s ease,
-      --half-line-color 2s ease, --danger-hover-bg 2s ease;
+      --half-line-color 2s ease, --danger-hover-bg 2s ease, --text-halo 2s ease;
   }
   .wrap{ max-width:1100px; margin:0 auto; position:relative; }
   .header-top-right{ position:absolute; top:0; right:0; display:flex; align-items:center; gap:10px; }
@@ -595,6 +595,7 @@
   @property --acc-apps{ syntax:'<color>'; inherits:true; initial-value:#059669; }
   @property --half-line-color{ syntax:'<color>'; inherits:true; initial-value:#f0f0f1; }
   @property --danger-hover-bg{ syntax:'<color>'; inherits:true; initial-value:#fef2f2; }
+  @property --text-halo{ syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,0.85); }
 
   :root{
     --surface-blur: none;
@@ -657,6 +658,7 @@
     --acc-apps: #6ee7b7;
     --half-line-color: rgba(255,255,255,0.08);
     --danger-hover-bg: rgba(220,38,38,0.16);
+    --text-halo: rgba(0,0,0,0.72);
     --surface-blur: blur(20px) saturate(160%);
     --fade-rgb: 20,20,24;
   }
@@ -693,6 +695,34 @@
     .theme-toggle-btn svg{ transition:opacity 150ms ease; transform:none !important; }
   }
 
+  /* A few pieces of muted text (header subtitle, hints, the sync status
+     line) sit directly on the transparent body — i.e. right on the sky —
+     rather than inside a card. --color-text-muted is a fixed mid-grey in
+     each theme, which can't hold contrast against a sky that continuously
+     drifts across the whole light-dark range, and the manual theme
+     toggle can pin light/dark independently of what the sky is actually
+     doing right now (e.g. Dark pinned at midday). A text-shadow halo only
+     glows around each glyph's own silhouette — it doesn't fill the gaps
+     between letters — so it wasn't dense enough on its own; a small
+     backing chip in the theme's own glass material (same treatment as
+     every card) guarantees contrast regardless of what the sky is doing. */
+  .sub, .hint, .home-date, .sync-status{
+    padding:2px 8px;
+    border-radius:7px;
+    background:var(--text-halo);
+  }
+  .sub, .hint, .home-date{
+    display:inline-block;
+  }
+  /* ...except inside a modal, which already sits on its own opaque/glass
+     surface — a second nested chip there would just double up the box. */
+  .modal .hint{
+    display:inline;
+    padding:0;
+    border-radius:0;
+    background:none;
+  }
+
   /* Accessibility: reduce transparency — drop the glass blur, dark
      surfaces become solid opaque. */
   @media (prefers-reduced-transparency: reduce){
@@ -726,6 +756,11 @@
       <span class="amherst-clock-time" id="amherstClockText">--:--:-- --</span>
       <span class="amherst-clock-label">Amherst</span>
     </div>
+    <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Theme: Auto" title="Theme: Auto">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      <span class="theme-toggle-mode" id="themeToggleModeText">Auto</span>
+    </button>
     <button type="button" class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
@@ -742,11 +777,6 @@
         <div class="shift-panel-list" id="shiftPanelList"></div>
       </div>
     </div>
-    <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Theme: Auto" title="Theme: Auto">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      <span class="theme-toggle-mode" id="themeToggleModeText">Auto</span>
-    </button>
     <div class="backup-controls">
       <button type="button" class="backup-icon-btn" id="headerExportBtn" aria-label="Export backup" title="Export backup">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
