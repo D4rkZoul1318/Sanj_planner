@@ -595,7 +595,7 @@
   @property --acc-apps{ syntax:'<color>'; inherits:true; initial-value:#059669; }
   @property --half-line-color{ syntax:'<color>'; inherits:true; initial-value:#f0f0f1; }
   @property --danger-hover-bg{ syntax:'<color>'; inherits:true; initial-value:#fef2f2; }
-  @property --text-halo{ syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,0.85); }
+  @property --text-halo{ syntax:'<color>'; inherits:true; initial-value:rgba(255,255,255,0.92); }
 
   :root{
     --surface-blur: none;
@@ -658,7 +658,7 @@
     --acc-apps: #6ee7b7;
     --half-line-color: rgba(255,255,255,0.08);
     --danger-hover-bg: rgba(220,38,38,0.16);
-    --text-halo: rgba(0,0,0,0.72);
+    --text-halo: rgba(0,0,0,0.8);
     --surface-blur: blur(20px) saturate(160%);
     --fade-rgb: 20,20,24;
   }
@@ -670,6 +670,19 @@
   body[data-theme="dark"] .home-card{
     border-top-color: rgba(255,255,255,0.22);
   }
+
+  /* The dashboard stat cards are the one place a category color washes
+     straight onto the transparent body instead of over an opaque/glass
+     surface first (every other user of these tokens — event blocks,
+     app badges, meal chips — sits inside a card that already has
+     var(--color-surface) behind it). At only 18% alpha with nothing
+     dark underneath, the accent read as a pale, low-contrast pastel
+     instead of the intended muted-color-over-dark-surface look, so
+     these are solid, pre-mixed dark tints instead of a transparency. */
+  body[data-theme="dark"] .stat-card.acc-shift{ background:#17223e; }
+  body[data-theme="dark"] .stat-card.acc-schedule{ background:#271b3e; }
+  body[data-theme="dark"] .stat-card.acc-budget{ background:#372615; }
+  body[data-theme="dark"] .stat-card.acc-apps{ background:#112b27; }
 
   /* Theme toggle (sun/moon), header */
   .theme-toggle-btn{
@@ -695,32 +708,25 @@
     .theme-toggle-btn svg{ transition:opacity 150ms ease; transform:none !important; }
   }
 
-  /* A few pieces of muted text (header subtitle, hints, the sync status
-     line) sit directly on the transparent body — i.e. right on the sky —
-     rather than inside a card. --color-text-muted is a fixed mid-grey in
-     each theme, which can't hold contrast against a sky that continuously
-     drifts across the whole light-dark range, and the manual theme
-     toggle can pin light/dark independently of what the sky is actually
-     doing right now (e.g. Dark pinned at midday). A text-shadow halo only
-     glows around each glyph's own silhouette — it doesn't fill the gaps
-     between letters — so it wasn't dense enough on its own; a small
-     backing chip in the theme's own glass material (same treatment as
-     every card) guarantees contrast regardless of what the sky is doing. */
+  /* A few pieces of tertiary text (header subtitle, hints, the sync
+     status line) sit directly on the transparent body — i.e. right on
+     the sky — rather than inside a card, and --color-text-muted is a
+     fixed mid-grey in each theme that can't hold contrast against a sky
+     that continuously drifts across the whole light-dark range (worse
+     once the manual toggle pins light/dark independent of what the sky
+     is actually doing). This is a plain diffuse glow, not a boxed
+     container: several soft, wide, layered shadows in a near-opaque
+     halo color let the blur from neighboring letters overlap and cover
+     the gaps between them, instead of just outlining each glyph. */
   .sub, .hint, .home-date, .sync-status{
-    padding:2px 8px;
-    border-radius:7px;
-    background:var(--text-halo);
-  }
-  .sub, .hint, .home-date{
-    display:inline-block;
+    text-shadow:
+      0 0 2px var(--text-halo), 0 0 5px var(--text-halo),
+      0 0 9px var(--text-halo), 0 0 14px var(--text-halo);
   }
   /* ...except inside a modal, which already sits on its own opaque/glass
-     surface — a second nested chip there would just double up the box. */
+     surface, so the glow is redundant there. */
   .modal .hint{
-    display:inline;
-    padding:0;
-    border-radius:0;
-    background:none;
+    text-shadow:none;
   }
 
   /* Accessibility: reduce transparency — drop the glass blur, dark
