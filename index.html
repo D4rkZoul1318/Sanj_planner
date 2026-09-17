@@ -313,6 +313,12 @@
   .shift-today-btn span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .shift-panel{ position:absolute; top:calc(100% + 8px); left:0; z-index:20; width:320px; max-width:calc(100vw - 32px); background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); box-shadow:0 8px 24px rgba(24,24,27,0.14); padding:8px; opacity:0; transform-origin:top left; transform:translateY(-6px) scale(0.98); pointer-events:none; transition:opacity 150ms ease-out, transform 150ms ease-out; }
   .shift-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .calendar-panel-inner{ padding:6px; }
+  .calendar-panel-title{ font-weight:700; font-size:13px; margin:0 0 8px; }
+  .calendar-url-row{ display:flex; gap:6px; margin-bottom:4px; }
+  .calendar-url-row input{ flex:1; min-width:0; border:1px solid var(--color-border); border-radius:6px; padding:6px 8px; font-size:12px; background:var(--color-bg); color:var(--color-text); font-family:inherit; }
+  .calendar-panel-inner .hint{ margin:8px 0 0; }
+  .calendar-panel-inner .hint + .hint{ margin-top:4px; }
   .shift-day-row{ border-radius:8px; padding:8px 10px; border-left:3px solid transparent; transition:background-color 120ms ease-out; }
   .shift-day-row:hover{ background:var(--color-bg); }
   .shift-day-row.today{ border-left-color:var(--color-accent); background:var(--color-bg); }
@@ -547,6 +553,15 @@
       </button>
       <div class="shift-panel" id="shiftPanel">
         <div class="shift-panel-list" id="shiftPanelList"></div>
+      </div>
+    </div>
+    <div class="shift-widget">
+      <button type="button" class="shift-today-btn" id="calendarBtn" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Calendar</span>
+      </button>
+      <div class="shift-panel" id="calendarPanel">
+        <div class="calendar-panel-inner" id="calendarPanelInner"></div>
       </div>
     </div>
     <div class="backup-controls">
@@ -2436,6 +2451,7 @@
 
   shiftTodayBtn.addEventListener('click', function(e){
     e.stopPropagation();
+    if(calendarPanel.classList.contains('open')) closeCalendarPanel();
     if(shiftPanel.classList.contains('open')) closeShiftPanel();
     else openShiftPanel();
   });
@@ -2444,6 +2460,72 @@
     if(!shiftPanel.classList.contains('open')) return;
     if(shiftPanel.contains(e.target) || shiftTodayBtn.contains(e.target)) return;
     closeShiftPanel();
+  });
+
+  /* ---------- Calendar subscribe (.ics) ---------- */
+
+  var calendarBtn = document.getElementById('calendarBtn');
+  var calendarPanel = document.getElementById('calendarPanel');
+  var calendarPanelInner = document.getElementById('calendarPanelInner');
+
+  function renderCalendarPanel(){
+    var code = storageGet(SYNC_CODE_KEY);
+    if(!code){
+      calendarPanelInner.innerHTML =
+        '<div class="calendar-panel-title">Calendar feed</div>' +
+        '<p class="hint" style="margin-top:0;">Set up sync first (the gear icon) — the calendar feed reads from your synced passcode.</p>';
+      return;
+    }
+    var url = location.origin + '/api/calendar.ics?code=' + encodeURIComponent(code);
+    calendarPanelInner.innerHTML =
+      '<div class="calendar-panel-title">Calendar feed</div>' +
+      '<div class="calendar-url-row">' +
+        '<input type="text" readonly id="calendarUrlInput" value="' + escapeHtml(url) + '" />' +
+        '<button type="button" class="btn btn-primary btn-sm" id="calendarCopyBtn">Copy</button>' +
+      '</div>' +
+      '<p class="hint" style="margin-top:8px;">Google Calendar: Other calendars → From URL → paste this</p>' +
+      '<p class="hint">Apple Calendar: File → New Calendar Subscription → paste this</p>';
+
+    var urlInput = document.getElementById('calendarUrlInput');
+    var copyBtn = document.getElementById('calendarCopyBtn');
+    copyBtn.addEventListener('click', function(){
+      urlInput.select();
+      var done = function(){
+        copyBtn.textContent = 'Copied!';
+        setTimeout(function(){ copyBtn.textContent = 'Copy'; }, 1500);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(done).catch(function(){
+          try{ document.execCommand('copy'); done(); }catch(e){}
+        });
+      }else{
+        try{ document.execCommand('copy'); done(); }catch(e){}
+      }
+    });
+  }
+
+  function openCalendarPanel(){
+    renderCalendarPanel();
+    calendarPanel.classList.add('open');
+    calendarBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeCalendarPanel(){
+    calendarPanel.classList.remove('open');
+    calendarBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  calendarBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(shiftPanel.classList.contains('open')) closeShiftPanel();
+    if(calendarPanel.classList.contains('open')) closeCalendarPanel();
+    else openCalendarPanel();
+  });
+
+  document.addEventListener('click', function(e){
+    if(!calendarPanel.classList.contains('open')) return;
+    if(calendarPanel.contains(e.target) || calendarBtn.contains(e.target)) return;
+    closeCalendarPanel();
   });
 
   /* ---------- Home ---------- */
