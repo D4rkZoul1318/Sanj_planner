@@ -3073,6 +3073,17 @@
     pullSyncOnce(code);
   }
 
+  // A tab left open on one device goes stale the moment another device
+  // pushes a change. Without this, editing in that stale tab later
+  // re-pushes its outdated snapshot with a newer timestamp, silently
+  // reviving whatever was deleted elsewhere. Re-pulling on return catches
+  // it up before that can happen.
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState !== 'visible' || !appReady) return;
+    var code = storageGet(SYNC_CODE_KEY);
+    if(code) pullSyncOnce(code);
+  });
+
   /* ---------- Bus schedule (Route 31, PVTA) ---------- */
 
   function formatBusTime(unixSeconds){
