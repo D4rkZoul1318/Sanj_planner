@@ -38,7 +38,17 @@
       "accent-meals-bg": { "role": "tertiary", "displayName": "Accent Meals (bg)", "canonical": "#ffedd5" },
       "accent-meals-fg": { "role": "tertiary", "displayName": "Accent Meals (fg)", "canonical": "#c2410c", "tonalRamp": ["#481804", "#822b08", "#bb3f0c", "#f05414", "#f47e4d", "#f8a887", "#fbd2c1", "#feeee7"] },
       "accent-bus-bg": { "role": "tertiary", "displayName": "Accent Bus (bg)", "canonical": "#ecfeff" },
-      "accent-bus-fg": { "role": "tertiary", "displayName": "Accent Bus (fg)", "canonical": "#0e7490", "tonalRamp": ["#073846", "#0c657d", "#1292b5", "#1bbde9", "#53cdee", "#8bddf4", "#c3edf9", "#e8f8fd"] }
+      "accent-bus-fg": { "role": "tertiary", "displayName": "Accent Bus (fg)", "canonical": "#0e7490", "tonalRamp": ["#073846", "#0c657d", "#1292b5", "#1bbde9", "#53cdee", "#8bddf4", "#c3edf9", "#e8f8fd"] },
+      "page-wash-schedule": { "role": "background", "displayName": "Schedule Page Wash", "canonical": "#f2edfc" },
+      "page-wash-budget": { "role": "background", "displayName": "Budget Page Wash", "canonical": "#f9edde" },
+      "page-wash-apps": { "role": "background", "displayName": "Applications Page Wash", "canonical": "#d6f8ed" },
+      "page-wash-meals": { "role": "background", "displayName": "Meals Page Wash", "canonical": "#faece5" },
+      "page-wash-bus": { "role": "background", "displayName": "Bus Page Wash", "canonical": "#dcf3f9" },
+      "wash-muted-schedule": { "role": "text", "displayName": "Muted Text on Schedule Wash", "canonical": "#4a2786" },
+      "wash-muted-budget": { "role": "text", "displayName": "Muted Text on Budget Wash", "canonical": "#865a27" },
+      "wash-muted-apps": { "role": "text", "displayName": "Muted Text on Applications Wash", "canonical": "#22775c" },
+      "wash-muted-meals": { "role": "text", "displayName": "Muted Text on Meals Wash", "canonical": "#864327" },
+      "wash-muted-bus": { "role": "text", "displayName": "Muted Text on Bus Wash", "canonical": "#277286" }
     },
     "typographyMeta": {
       "display": { "displayName": "Display", "purpose": "The 'Sanj's Planner' wordmark only. Never reused elsewhere." },
@@ -121,6 +131,14 @@
       "description": "Signature component: an absolutely-positioned schedule-grid event card with a colored left border accent.",
       "html": "<div class=\"ds-event\"><span class=\"ds-event-title\">Work shift</span><span class=\"ds-event-meta\">14:00–17:30</span></div>",
       "css": ".ds-event { border-radius: 6px; padding: 5px 8px 5px 9px; font-family: Quicksand, sans-serif; font-size: 12px; line-height: 1.3; overflow: hidden; cursor: pointer; border-left: 3px solid #7c3aed; background: #ede9fe; color: #6d28d9; box-shadow: 0 1px 2px rgba(24,24,27,0.06); transition: transform 120ms ease-out, box-shadow 120ms ease-out; } .ds-event:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(24,24,27,0.14); } .ds-event-title { font-weight: 700; display: block; } .ds-event-meta { display: block; font-size: 11px; font-weight: 500; opacity: 0.85; }"
+    },
+    {
+      "name": "Washi Tape",
+      "kind": "custom",
+      "refersTo": "title-tape",
+      "description": "Signature decorative component: a rotated strip of translucent color behind the 'Sanj's Planner' wordmark, like tape holding down a notebook page corner. Plain translucent color plus one soft gradient only — no repeating-stripe texture.",
+      "html": "<span class=\"ds-tape\" aria-hidden=\"true\"></span>",
+      "css": ".ds-tape { position: absolute; width: 72px; height: 23px; background: linear-gradient(100deg, rgba(217,119,6,0.52), rgba(217,119,6,0.4)); border-radius: 2px; transform: rotate(-4deg); box-shadow: 0 2px 4px rgba(24,24,27,0.14); pointer-events: none; }"
     }
   ],
   "narrative": {
@@ -135,21 +153,24 @@
     ],
     "rules": [
       { "name": "The One Accent Rule", "body": "Confident Indigo appears only on things you can act on (buttons, active tab, links, FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful. This governs Indigo specifically; it does not restrict the Secondary/Tertiary category colors, which are meant to be used generously.", "section": "colors" },
-      { "name": "The Category Owns Its Color Rule", "body": "Once a UI element is about a specific category or status (a tab, a stat card, a status filter, a budget), it wears that category's own accent — never generic Indigo, never plain gray. A stat card's border tints to its own accent; a status filter's active state fills with that exact status's color; the active budget-switcher pill is Accent Budget, not Confident Indigo. Only truly generic, non-categorized actions (a primary Save button, the active tab pill itself, the FAB) get Confident Indigo. When adding a new category or status, give it a real accent and apply it to both its small chip and whatever container/pill represents it at rest.", "section": "colors" },
+      { "name": "The Category Owns Its Color Rule", "body": "Once a UI element is about a specific category or status (a tab, a stat card, a status filter, a budget), it wears that category's own accent — never generic Indigo, never plain gray. A stat card's border tints to its own accent; a status filter's active state fills with that exact status's color; the active budget-switcher pill is Accent Budget, not Confident Indigo. Only truly generic, non-categorized actions (a primary Save button, the active tab pill itself, the FAB) get Confident Indigo. When adding a new category or status, give it a real accent and apply it to both its small chip and whatever container/pill represents it at rest. This extends to the page itself: a tab's own page background and its on-page muted text carry the color too, not just cards and chips.", "section": "colors" },
       { "name": "The One-Wordmark Rule", "body": "Ephesis renders exactly once per screen — the page title. Every other heading, however large, stays in Quicksand at a heavier weight instead of switching typeface.", "section": "typography" },
-      { "name": "The Float-Only Shadow Rule", "body": "A visible shadow is a signal that something is temporarily above the page (a panel, a modal, a hovered card) — never a permanent decoration on static content.", "section": "elevation" }
+      { "name": "The Float-Only Shadow Rule", "body": "A visible shadow is a signal that something is temporarily above the page (a panel, a modal, a hovered card) — never a permanent decoration on static content.", "section": "elevation" },
+      { "name": "The Page Is Also a Category Rule", "body": "Five of the six tabs are each a differently-tinted page, not a flat ivory canvas — like tabbed dividers in a physical binder — over a constant subtle dot-grid paper texture. Muted text sitting directly on a tab's wash tints toward that tab's own hue instead of staying gray; every floating surface (modals, popovers) resets back to neutral Warm Taupe on Paper White, since a popover is temporarily above the page, never part of it. Home stays untinted Warm Ivory since it is the overview, not one category.", "section": "colors" }
     ],
     "dos": [
       "Do reserve Confident Indigo for actionable elements only (buttons, active tab, links, FAB, focus rings) — never as a decorative fill or background tint.",
       "Do apply the universal press-down scale (transform: scale(0.93-0.98), ~150ms ease-out) to every new tappable element.",
       "Do use the existing Secondary/Tertiary pastel pairs for any new category or status, rather than introducing a new hue.",
-      "Do keep shadows near-invisible on static content and reserve a visible shadow for anything that floats above the page."
+      "Do keep shadows near-invisible on static content and reserve a visible shadow for anything that floats above the page.",
+      "Do tint secondary/muted text from the surface's own hue when it sits on a colored page background — never plain gray on a colored surface."
     ],
     "donts": [
-      "Don't reintroduce an ambient gradient background, animated sky, or dark mode — both were built and explicitly rejected; the system is a single flat, warm, light theme by deliberate decision, not by omission.",
+      "Don't reintroduce an ambient gradient background, animated sky, or dark mode — both were built and explicitly rejected; the system is a single flat, warm, light theme by deliberate decision, not by omission. The per-tab page wash is a different device (a static, deliberate-palette tint per tab, not an atmospheric or animated gradient) and does not reopen that rejection.",
       "Don't use the Ephesis script font anywhere except the single \"Sanj's Planner\" wordmark.",
       "Don't add a border-and-shadow combination to a resting card — pick one (border for list/table containers, shadow-only for freestanding cards) rather than stacking both as a default.",
-      "Don't introduce a new framework, build step, or npm dependency to achieve a visual effect this system doesn't already support with plain CSS."
+      "Don't introduce a new framework, build step, or npm dependency to achieve a visual effect this system doesn't already support with plain CSS.",
+      "Don't use repeating-gradient stripes as surface texture or decoration — it reads as a generated-UI tell. Use a plain surface, a single (non-repeating) gradient, or a genuine dot/grid texture instead."
     ]
   }
 }

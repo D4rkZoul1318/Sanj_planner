@@ -37,6 +37,16 @@ colors:
   accent-meals-fg: "#c2410c"
   accent-bus-bg: "#ecfeff"
   accent-bus-fg: "#0e7490"
+  page-wash-schedule: "#f2edfc"
+  page-wash-budget: "#f9edde"
+  page-wash-apps: "#d6f8ed"
+  page-wash-meals: "#faece5"
+  page-wash-bus: "#dcf3f9"
+  wash-muted-schedule: "#4a2786"
+  wash-muted-budget: "#865a27"
+  wash-muted-apps: "#22775c"
+  wash-muted-meals: "#864327"
+  wash-muted-bus: "#277286"
 typography:
   display:
     fontFamily: "Ephesis, cursive"
@@ -61,6 +71,7 @@ typography:
     fontWeight: 700
     lineHeight: 1.3
 rounded:
+  tape: "2px"
   xs: "6px"
   sm: "8px"
   md: "10px"
@@ -95,6 +106,9 @@ components:
   card:
     backgroundColor: "{colors.paper-white}"
     rounded: "{rounded.md}"
+  title-tape:
+    backgroundColor: "rgba(217,119,6,0.45)"
+    rounded: "{rounded.tape}"
 ---
 
 # Design System: Sanj's Planner
@@ -141,16 +155,22 @@ One feature-accent per tab — the app's six-color wayfinding system. Each tab's
 - **Accent Bus** (#ecfeff / #0e7490): the Bus tab's heading underline, inactive Bus tab icon. The one tertiary hue with no Secondary-palette relative — introduced for Bus since transit had no existing color to inherit.
 
 ### Neutral
-- **Warm Ivory** (#f7f4ef): Page background.
-- **Paper White** (#ffffff): Card, table, panel, and input surfaces.
+- **Warm Ivory** (#f7f4ef): Home tab's page background — the app's neutral "home base," left untinted since Home is the overview, not one category.
+- **Paper White** (#ffffff): Card, table, panel, and input surfaces, and every floating surface (modals, popovers) regardless of which tab is open behind them.
 - **Soft Stone** (#e7e5e4): Borders and dividers, everywhere.
 - **Ink** (#18181b): Primary text.
-- **Warm Taupe** (#716b66): Secondary/muted text — labels, captions, placeholders, helper copy. Darkened slightly from an earlier #78716c after a critique found it failing WCAG AA (4.5:1) against the page background and two of the four stat-card tints; this value clears AA against all of them.
+- **Warm Taupe** (#716b66): Secondary/muted text on Warm Ivory or a white surface — labels, captions, placeholders, helper copy. Darkened slightly from an earlier #78716c after a critique found it failing WCAG AA (4.5:1) against the page background and two of the four stat-card tints; this value clears AA against all of them.
+
+### Background
+The other five tabs are each a differently-tinted page, not a flat ivory canvas — like tabbed dividers in a physical binder. `body`'s background color transitions (350ms ease) to that tab's own wash the moment it becomes active, over a constant, subtle dot-grid texture (`radial-gradient` dots, 20px grid, 5.5% ink) that reads as real notebook paper at any wash color. Each wash is its tab's accent hue pulled down to ~90-96% lightness — visibly colored, not the near-invisible tint a background wash defaults to — and independently tuned per hue so muted text sitting directly on it still clears WCAG AA:
+- **Schedule wash** (#f2edfc), **Budget wash** (#f9edde), **Applications wash** (#d6f8ed), **Meals wash** (#faece5), **Bus wash** (#dcf3f9).
+
+Muted text (`.sub`, `.hint`) that sits directly on a tab's wash — not inside a white card — tints toward that tab's own hue instead of staying Warm Taupe gray: **wash-muted-schedule** (#4a2786), **wash-muted-budget** (#865a27), **wash-muted-apps** (#22775c), **wash-muted-meals** (#864327), **wash-muted-bus** (#277286), each tuned to clear 4.5:1 against its own wash. Every floating surface (`.modal`, `.shift-panel`) resets muted text back to Warm Taupe — a popover is a neutral surface temporarily above the page, never part of the colored page itself.
 
 ### Named Rules
 **The One Accent Rule.** Confident Indigo appears only on things you can act on (buttons, the active tab, links, the FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful. This governs Indigo specifically; it does not restrict the Secondary/Tertiary category colors below, which are meant to be used generously.
 
-**The Category Owns Its Color Rule.** Once a UI element is *about* a specific category or status (a tab, a stat card, a status filter, a budget), it wears that category's own accent — never generic Indigo, never plain gray. A stat card's border tints to its own accent (not `--color-border`); a status filter's active state fills with that exact status's color (Interviewing = amber, Rejected = red — not one indigo for all six); the active budget-switcher pill is Accent Budget, not Confident Indigo. Only truly generic, non-categorized actions (a primary "Save" button, the active tab pill itself, the FAB) get Confident Indigo. When adding a new category or status anywhere, give it a real accent from this page and apply it to both its small chip *and* whatever container/pill represents it at rest — a color that only shows up in one place isn't finished.
+**The Category Owns Its Color Rule.** Once a UI element is *about* a specific category or status (a tab, a stat card, a status filter, a budget), it wears that category's own accent — never generic Indigo, never plain gray. A stat card's border tints to its own accent (not `--color-border`); a status filter's active state fills with that exact status's color (Interviewing = amber, Rejected = red — not one indigo for all six); the active budget-switcher pill is Accent Budget, not Confident Indigo. Only truly generic, non-categorized actions (a primary "Save" button, the active tab pill itself, the FAB) get Confident Indigo. When adding a new category or status anywhere, give it a real accent from this page and apply it to both its small chip *and* whatever container/pill represents it at rest — a color that only shows up in one place isn't finished. This now extends to the page itself (see Background above): a category's ownership isn't finished at the container level — its tab's own page background and on-page muted text carry the color too, not just cards and chips.
 
 ## Typography
 
@@ -219,6 +239,9 @@ Two corner languages, chosen by purpose: fully rounded pills (`border-radius: 99
 ### Time Blocks (signature component)
 The Schedule tab's positioned event blocks are the app's most distinctive custom component: an absolutely-positioned card with a 3px solid left border in the category's saturated color, that category's soft tint as background, a bold title line and a smaller muted time-range line beneath it, 6px corner radius, and the same hover-lift / active-press behavior as every other interactive element. Three color families only (College/blue, Personal/green, Work-Other/violet) keep a dense week grid scannable at a glance.
 
+### Washi Tape (signature component)
+A small rotated strip of translucent color (`title-tape`, 2px radius, -4deg rotation) sits behind the "Sanj's Planner" wordmark like a real piece of tape holding down a notebook page corner — the app's one purely decorative personality touch, reinforcing the physical-notebook metaphor without animation or sound. Plain translucent color plus a single soft gradient only; no repeating-stripe texture (a known generated-UI tell the first version of this component used and was corrected away from).
+
 ## Do's and Don'ts
 
 ### Do:
@@ -226,9 +249,11 @@ The Schedule tab's positioned event blocks are the app's most distinctive custom
 - **Do** apply the universal press-down scale (`transform: scale(0.93-0.98)`, ~150ms ease-out) to every new tappable element.
 - **Do** use the existing Secondary/Tertiary pastel pairs for any new category or status, rather than introducing a new hue.
 - **Do** keep shadows near-invisible on static content and reserve a visible shadow for anything that floats above the page.
+- **Do** tint secondary/muted text from the surface's own hue when it sits on a colored page background — never plain gray on a colored surface (see Background above).
 
 ### Don't:
-- **Don't** reintroduce an ambient gradient background, animated sky, or dark mode — both were built and explicitly rejected; the system is a single flat, warm, light theme by deliberate decision, not by omission.
+- **Don't** reintroduce an ambient gradient background, animated sky, or dark mode — both were built and explicitly rejected; the system is a single flat, warm, light theme by deliberate decision, not by omission. The per-tab page wash is a different device (a static, deliberate-palette tint per tab, not an atmospheric or animated gradient) and does not reopen that rejection.
 - **Don't** use the Ephesis script font anywhere except the single "Sanj's Planner" wordmark.
 - **Don't** add a border-and-shadow combination to a resting card — pick one (border for list/table containers, shadow-only for freestanding cards) rather than stacking both as a default.
 - **Don't** introduce a new framework, build step, or npm dependency to achieve a visual effect this system doesn't already support with plain CSS.
+- **Don't** use repeating-gradient stripes as surface texture or decoration — it reads as a generated-UI tell. Use a plain surface, a single (non-repeating) gradient, or a genuine dot/grid texture instead.
