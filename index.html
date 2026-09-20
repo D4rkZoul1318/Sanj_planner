@@ -58,12 +58,14 @@
     --radius: 10px;
   }
   *{ box-sizing:border-box; }
+  html{ overflow-x:hidden; }
   body{
     margin:0;
     font-family:"Quicksand",-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
     background:var(--color-bg);
     color:var(--color-text);
     padding:24px 16px 96px;
+    overflow-x:hidden;
   }
   .wrap{ max-width:1100px; margin:0 auto; position:relative; }
   .header-top-right{ position:absolute; top:0; right:0; display:flex; align-items:center; gap:10px; }
@@ -71,8 +73,20 @@
   .settings-btn:hover{ border-color:var(--color-accent); color:var(--color-accent); }
   .settings-btn:active{ transform:scale(0.93); }
   .settings-btn svg{ width:18px; height:18px; }
+  .header-top-right .shift-widget{ margin-top:0; }
+  #settingsPanel{ left:auto; right:0; transform-origin:top right; width:230px; }
+  .settings-panel-inner{ padding:4px; }
+  .settings-menu-item{ display:flex; align-items:center; gap:8px; width:100%; padding:9px 10px; border:none; background:none; border-radius:8px; font-family:inherit; font-size:13px; font-weight:600; color:var(--color-text); cursor:pointer; text-align:left; transition:background-color 120ms ease-out; }
+  .settings-menu-item:hover{ background:var(--color-bg); }
+  .settings-menu-item:active{ transform:scale(0.98); }
+  .settings-menu-item svg{ width:16px; height:16px; color:var(--color-text-muted); flex-shrink:0; }
+  .settings-sync-status{ margin-top:6px; padding:8px 10px 2px; border-top:1px solid var(--color-border); font-size:12px; color:var(--color-text-muted); }
+  @media (min-width:641px){
+    .settings-panel{ display:none; }
+  }
   @media (max-width:640px){
     .header-top-right{ position:static; margin:0 0 14px; justify-content:flex-end; }
+    #calendarBtn{ display:none; }
   }
   h1{ font-size:44px; font-weight:800; letter-spacing:-0.02em; margin:0 0 4px; }
   h2{ font-size:16px; font-weight:800; letter-spacing:-0.01em; margin:0 0 10px; }
@@ -461,6 +475,9 @@
   .sync-status.synced::before{ background:#059669; }
   .sync-status.syncing::before{ background:#d97706; animation:syncPulse 1s ease-in-out infinite; }
   .sync-status.offline::before{ background:#dc2626; }
+  @media (max-width:640px){
+    .backup-controls, .sync-status{ display:none; }
+  }
   @keyframes syncPulse{
     0%, 100%{ opacity:1; }
     50%{ opacity:0.4; }
@@ -539,9 +556,32 @@
       <span class="amherst-clock-time" id="amherstClockText">--:--:-- --</span>
       <span class="amherst-clock-label">Amherst</span>
     </div>
-    <button type="button" class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-    </button>
+    <div class="shift-widget">
+      <button type="button" class="settings-btn" id="settingsBtn" aria-haspopup="true" aria-expanded="false" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+      <div class="shift-panel settings-panel" id="settingsPanel">
+        <div class="settings-panel-inner">
+          <button type="button" class="settings-menu-item" id="settingsCalendarItem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Subscribe to Calendar</span>
+          </button>
+          <button type="button" class="settings-menu-item" id="settingsExportItem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export backup</span>
+          </button>
+          <button type="button" class="settings-menu-item" id="settingsImportItem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span>Import backup</span>
+          </button>
+          <button type="button" class="settings-menu-item" id="settingsPasscodeItem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Change sync passcode</span>
+          </button>
+          <div class="settings-sync-status" id="settingsSyncStatus">Syncing…</div>
+        </div>
+      </div>
+    </div>
   </div>
   <header>
     <h1 class="ephesis-regular">Sanj's Planner</h1>
@@ -1354,6 +1394,7 @@
 
   function initTabs(){
     var buttons = document.querySelectorAll('.tab-btn');
+    var fabBtn = document.getElementById('fab');
     var panels = {
       home: document.getElementById('tab-home'),
       schedule: document.getElementById('tab-schedule'),
@@ -1371,6 +1412,9 @@
       Object.keys(panels).forEach(function(key){
         panels[key].hidden = key !== name;
       });
+      fabBtn.dataset.tab = name;
+      fabBtn.style.display = (name === 'budget' || name === 'meals' || name === 'bus') ? 'none' : '';
+      fabBtn.setAttribute('aria-label', name === 'applications' ? 'Add application' : 'Add time block');
       if(name === 'home') renderHome();
       if(name === 'schedule') scrollToNow();
       if(name === 'meals') renderMeals();
@@ -1456,7 +1500,10 @@
 
   document.getElementById('cancelBtn').addEventListener('click', closeModal);
   document.getElementById('addBtnTop').addEventListener('click', function(){ openModal(0, null); });
-  document.getElementById('fab').addEventListener('click', function(){ openModal(0, null); });
+  document.getElementById('fab').addEventListener('click', function(){
+    if(this.dataset.tab === 'applications'){ openAppModal(null); }
+    else{ openModal(0, null); }
+  });
   overlay.addEventListener('click', function(e){ if(e.target === overlay) closeModal(); });
   document.addEventListener('keydown', function(e){
     if(e.key !== 'Escape') return;
@@ -2531,6 +2578,64 @@
     closeCalendarPanel();
   });
 
+  /* ---------- Settings menu (mobile: folds Calendar/backup/sync-status behind the gear) ---------- */
+
+  var settingsBtn = document.getElementById('settingsBtn');
+  var settingsPanel = document.getElementById('settingsPanel');
+
+  function isMobileViewport(){
+    return window.matchMedia('(max-width:640px)').matches;
+  }
+
+  function openSettingsPanel(){
+    settingsPanel.classList.add('open');
+    settingsBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeSettingsPanel(){
+    settingsPanel.classList.remove('open');
+    settingsBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  settingsBtn.addEventListener('click', function(e){
+    if(!isMobileViewport()){
+      openChangePasscodeModal();
+      return;
+    }
+    e.stopPropagation();
+    if(shiftPanel.classList.contains('open')) closeShiftPanel();
+    if(calendarPanel.classList.contains('open')) closeCalendarPanel();
+    if(settingsPanel.classList.contains('open')) closeSettingsPanel();
+    else openSettingsPanel();
+  });
+
+  document.addEventListener('click', function(e){
+    if(!settingsPanel.classList.contains('open')) return;
+    if(settingsPanel.contains(e.target) || settingsBtn.contains(e.target)) return;
+    closeSettingsPanel();
+  });
+
+  document.getElementById('settingsCalendarItem').addEventListener('click', function(e){
+    e.stopPropagation();
+    closeSettingsPanel();
+    calendarBtn.click();
+  });
+  document.getElementById('settingsExportItem').addEventListener('click', function(e){
+    e.stopPropagation();
+    closeSettingsPanel();
+    document.getElementById('headerExportBtn').click();
+  });
+  document.getElementById('settingsImportItem').addEventListener('click', function(e){
+    e.stopPropagation();
+    closeSettingsPanel();
+    document.getElementById('headerImportBtn').click();
+  });
+  document.getElementById('settingsPasscodeItem').addEventListener('click', function(e){
+    e.stopPropagation();
+    closeSettingsPanel();
+    openChangePasscodeModal();
+  });
+
   /* ---------- Home ---------- */
 
   var CATEGORY_LABEL = { college:'College', personal:'Personal', other:'Work / other' };
@@ -2943,9 +3048,12 @@
 
   var syncStatusEl = document.getElementById('syncStatus');
   function setSyncStatus(state, label){
-    if(!syncStatusEl) return;
-    syncStatusEl.className = 'sync-status ' + state;
-    syncStatusEl.textContent = label;
+    if(syncStatusEl){
+      syncStatusEl.className = 'sync-status ' + state;
+      syncStatusEl.textContent = label;
+    }
+    var settingsSyncStatusEl = document.getElementById('settingsSyncStatus');
+    if(settingsSyncStatusEl) settingsSyncStatusEl.textContent = label;
   }
 
   var syncPushTimer = null;
@@ -3040,8 +3148,6 @@
     syncCodeOverlay.classList.add('open');
     setTimeout(function(){ syncCodeInput.focus(); }, 50);
   }
-
-  document.getElementById('settingsBtn').addEventListener('click', openChangePasscodeModal);
 
   function closeSyncCodeModal(){
     syncCodeOverlay.classList.remove('open');
