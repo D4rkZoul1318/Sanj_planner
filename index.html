@@ -55,6 +55,10 @@
     --acc-budget: #d97706;
     --acc-apps-bg: #ecfdf5;
     --acc-apps: #059669;
+    --acc-meals-bg: #ffedd5;
+    --acc-meals: #c2410c;
+    --acc-bus-bg: #ecfeff;
+    --acc-bus: #0e7490;
     --radius: 10px;
   }
   *{ box-sizing:border-box; }
@@ -229,10 +233,15 @@
   /* Tabs */
   .tab-nav{ display:flex; gap:4px; margin-top:18px; padding:4px; width:fit-content; max-width:100%; background:var(--color-surface); border:1px solid var(--color-border); border-radius:999px; box-shadow:0 1px 3px rgba(24,24,27,0.05); }
   .tab-btn{ display:flex; align-items:center; justify-content:center; gap:6px; background:none; border:none; padding:9px 16px; font-size:14px; font-weight:600; color:var(--color-text-muted); cursor:pointer; border-radius:999px; transition:background-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; }
-  .tab-btn svg{ width:16px; height:16px; flex-shrink:0; }
+  .tab-btn svg{ width:16px; height:16px; flex-shrink:0; transition:color 150ms ease-out; }
   .tab-btn:hover{ color:var(--color-text); }
   .tab-btn:active{ transform:scale(0.97); }
   .tab-btn.active{ background:var(--color-accent); color:#fff; }
+  .tab-btn[data-tab="schedule"]:not(.active) svg{ color:var(--acc-schedule); }
+  .tab-btn[data-tab="meals"]:not(.active) svg{ color:var(--acc-meals); }
+  .tab-btn[data-tab="budget"]:not(.active) svg{ color:var(--acc-budget); }
+  .tab-btn[data-tab="applications"]:not(.active) svg{ color:var(--acc-apps); }
+  .tab-btn[data-tab="bus"]:not(.active) svg{ color:var(--acc-bus); }
   .tab-panel{ margin-top:24px; }
   @media (max-width:480px){
     .tab-nav{ width:100%; }
@@ -258,11 +267,11 @@
   .budget-pill{ background:var(--color-surface); border:1px solid var(--color-border); border-radius:999px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--color-text-muted); cursor:pointer; transition:background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out; }
   .budget-pill:hover{ color:var(--color-text); }
   .budget-pill:active{ transform:scale(0.97); }
-  .budget-pill.active{ background:var(--color-accent); border-color:var(--color-accent); color:#fff; }
+  .budget-pill.active{ background:var(--acc-budget); border-color:var(--acc-budget); color:#fff; }
   .budget-pill-add{ width:30px; height:30px; border-radius:50%; border:1px dashed var(--color-border); background:transparent; color:var(--color-text-muted); font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; }
   .budget-pill-add:hover{ border-color:var(--color-accent); color:var(--color-accent); }
   .budget-pill-add:active{ transform:scale(0.93); }
-  .category-row td{ background:var(--color-bg); padding:8px 12px; }
+  .category-row td{ background:var(--acc-budget-bg); padding:8px 12px; }
   .category-row .cat-name-input{ border:none; background:transparent; font-weight:700; font-size:13px; padding:2px 4px; width:100%; color:var(--color-text); }
   .category-row .cat-name-input:focus{ outline:1px solid var(--color-border); border-radius:4px; background:var(--color-surface); }
   .category-subtotal{ text-align:right; font-variant-numeric:tabular-nums; color:var(--color-text-muted); font-weight:700; font-size:13px; }
@@ -280,6 +289,12 @@
   .app-filters{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
   .app-chip{ border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text-muted); border-radius:999px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; transition:background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out; }
   .app-chip.active{ background:var(--color-accent); border-color:var(--color-accent); color:#fff; }
+  .app-chip.applied.active{ background:var(--st-applied-text); border-color:var(--st-applied-text); }
+  .app-chip.oa.active{ background:var(--st-oa-text); border-color:var(--st-oa-text); }
+  .app-chip.interviewing.active{ background:var(--st-interview-text); border-color:var(--st-interview-text); }
+  .app-chip.offer.active{ background:var(--st-offer-text); border-color:var(--st-offer-text); }
+  .app-chip.rejected.active{ background:var(--st-rejected-text); border-color:var(--st-rejected-text); }
+  .app-chip.ghosted.active{ background:var(--st-ghosted-text); border-color:var(--st-ghosted-text); }
 
   .app-list{ border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); overflow:hidden; box-shadow:0 1px 3px rgba(24,24,27,0.05); }
   .app-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; padding:14px 16px; border-bottom:1px solid var(--color-border); cursor:pointer; transition:background-color 120ms ease-out; }
@@ -359,7 +374,7 @@
   .week-pill{ flex:1; text-align:center; padding:10px 4px; border-radius:10px; background:var(--color-surface); border:1px solid var(--color-border); font-size:12px; font-weight:700; color:var(--color-text-muted); cursor:pointer; transition:background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out; }
   .week-pill:hover{ color:var(--color-text); }
   .week-pill:active{ transform:scale(0.96); }
-  .week-pill.today:not(.selected){ border-color:var(--color-accent); color:var(--color-accent); }
+  .week-pill.today:not(.selected){ border-color:var(--color-accent); color:var(--color-accent); background:rgba(79,70,229,0.07); }
   .week-pill.selected{ background:var(--color-accent); border-color:var(--color-accent); color:#fff; }
 
   .home-greeting-row{ display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
@@ -395,17 +410,17 @@
   .stat-card-value{ display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; font-size:22px; font-weight:800; letter-spacing:-0.02em; line-height:1.2; }
   .stat-card-sub{ display:block; font-size:12px; color:var(--color-text-muted); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-  .stat-card.acc-shift{ background:var(--acc-shift-bg); }
-  .stat-card.acc-shift .stat-card-icon{ background:rgba(37,99,235,0.14); color:var(--acc-shift); }
+  .stat-card.acc-shift{ background:var(--acc-shift-bg); border-color:rgba(37,99,235,0.28); }
+  .stat-card.acc-shift .stat-card-icon{ background:rgba(37,99,235,0.16); color:var(--acc-shift); }
   .stat-card.acc-shift .stat-card-value{ color:var(--acc-shift); }
-  .stat-card.acc-schedule{ background:var(--acc-schedule-bg); }
-  .stat-card.acc-schedule .stat-card-icon{ background:rgba(124,58,237,0.14); color:var(--acc-schedule); }
+  .stat-card.acc-schedule{ background:var(--acc-schedule-bg); border-color:rgba(124,58,237,0.28); }
+  .stat-card.acc-schedule .stat-card-icon{ background:rgba(124,58,237,0.16); color:var(--acc-schedule); }
   .stat-card.acc-schedule .stat-card-value{ color:var(--acc-schedule); }
-  .stat-card.acc-budget{ background:var(--acc-budget-bg); }
-  .stat-card.acc-budget .stat-card-icon{ background:rgba(217,119,6,0.14); color:var(--acc-budget); }
+  .stat-card.acc-budget{ background:var(--acc-budget-bg); border-color:rgba(217,119,6,0.28); }
+  .stat-card.acc-budget .stat-card-icon{ background:rgba(217,119,6,0.16); color:var(--acc-budget); }
   .stat-card.acc-budget .stat-card-value{ color:var(--acc-budget); }
-  .stat-card.acc-apps{ background:var(--acc-apps-bg); }
-  .stat-card.acc-apps .stat-card-icon{ background:rgba(5,150,105,0.14); color:var(--acc-apps); }
+  .stat-card.acc-apps{ background:var(--acc-apps-bg); border-color:rgba(5,150,105,0.28); }
+  .stat-card.acc-apps .stat-card-icon{ background:rgba(5,150,105,0.16); color:var(--acc-apps); }
   .stat-card.acc-apps .stat-card-value{ color:var(--acc-apps); }
 
   @keyframes statCardIn{
@@ -464,6 +479,8 @@
   #tab-schedule .toolbar{ border-top:3px solid var(--acc-schedule); padding-top:14px; }
   #tab-budget > h2{ display:inline-block; padding-bottom:6px; border-bottom:3px solid var(--acc-budget); }
   #tab-applications > h2{ display:inline-block; padding-bottom:6px; border-bottom:3px solid var(--acc-apps); }
+  #tab-bus > h2{ display:inline-block; padding-bottom:6px; border-bottom:3px solid var(--acc-bus); }
+  #tab-meals > h2{ display:inline-block; padding-bottom:6px; border-bottom:3px solid var(--acc-meals); }
 
   /* Backup controls (header) */
   .backup-controls{ display:inline-flex; gap:6px; margin-left:10px; vertical-align:middle; }
@@ -514,6 +531,7 @@
   @media (prefers-reduced-motion: reduce){
     .saved-toast{ transform:translate(-50%, 0); transition:opacity 200ms ease-out; }
   }
+  .milestone-toast{ background:var(--acc-apps); bottom:76px; max-width:calc(100vw - 32px); text-align:center; }
 
   .mini-cal-head{ display:flex; align-items:center; margin-bottom:10px; }
   .mini-cal-title{ flex:1; text-align:center; font-weight:700; font-size:13px; }
@@ -839,6 +857,7 @@
 <button class="fab" id="fab" aria-label="Add block">+</button>
 
 <div class="saved-toast" id="savedToast" role="status" aria-live="polite">Saved</div>
+<div class="saved-toast milestone-toast" id="milestoneToast" role="status" aria-live="polite"></div>
 
 <div class="overlay" id="syncCodeOverlay">
   <div class="modal">
@@ -1289,6 +1308,18 @@
     savedToastEl.classList.add('show');
     clearTimeout(savedToastTimer);
     savedToastTimer = setTimeout(function(){ savedToastEl.classList.remove('show'); }, 1300);
+  }
+
+  var milestoneToastEl = document.getElementById('milestoneToast');
+  var milestoneToastTimer = null;
+  function showMilestoneToast(text){
+    if(!milestoneToastEl) return;
+    milestoneToastEl.textContent = text;
+    milestoneToastEl.classList.remove('show');
+    void milestoneToastEl.offsetWidth;
+    milestoneToastEl.classList.add('show');
+    clearTimeout(milestoneToastTimer);
+    milestoneToastTimer = setTimeout(function(){ milestoneToastEl.classList.remove('show'); }, 3200);
   }
 
   async function loadAll(){
@@ -2185,6 +2216,7 @@
       followUpDate: document.getElementById('fa-followup').value,
       notes: document.getElementById('fa-notes').value.trim()
     };
+    var isFirstApplication = !editingAppId && applications.length === 0;
     if(editingAppId){
       applications = applications.map(function(a){ return a.id === editingAppId ? record : a; });
     }else{
@@ -2193,6 +2225,9 @@
     saveApplications();
     renderApplications();
     closeAppModal();
+    if(isFirstApplication){
+      setTimeout(function(){ showMilestoneToast('First one logged — the hardest part is starting.'); }, 400);
+    }
   });
 
   appDeleteBtn.addEventListener('click', function(){
@@ -2221,7 +2256,8 @@
     options.forEach(function(opt){
       var chip = document.createElement('button');
       chip.type = 'button';
-      chip.className = 'app-chip' + (appStatusFilter === opt ? ' active' : '');
+      var statusClass = opt === 'all' ? '' : ' ' + APP_STATUS_CLASS[opt];
+      chip.className = 'app-chip' + statusClass + (appStatusFilter === opt ? ' active' : '');
       chip.textContent = opt === 'all' ? 'All' : opt;
       chip.addEventListener('click', function(){ appStatusFilter = opt; renderApplications(); });
       appFiltersEl.appendChild(chip);
@@ -2655,12 +2691,22 @@
   var selectedDayIndex = getTodayIndex();
   var selectedCalDate = null;
 
+  var DAY_SUBTITLES = [
+    'Monday — full send, here’s the week ahead.',
+    'Tuesday’s plan at a glance.',
+    'Halfway there. Wednesday’s rundown below.',
+    'Thursday — almost through the week.',
+    'Friday. Last stretch before the weekend.',
+    'Saturday’s plan — lighter, hopefully.',
+    'Sunday reset — here’s what’s ahead this week.'
+  ];
+
   function renderHomeGreeting(){
     var now = bostonNow();
     var hour = now.getHours();
     var greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     document.getElementById('homeGreeting').textContent = greeting + ', Sanj \u{1F44B}';
-    document.getElementById('homeSubtitle').textContent = DAY_NAMES_FULL[selectedDayIndex] + '’s plan at a glance.';
+    document.getElementById('homeSubtitle').textContent = DAY_SUBTITLES[selectedDayIndex];
   }
 
   function renderHomeDate(){

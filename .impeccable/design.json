@@ -34,7 +34,11 @@
       "accent-budget-bg": { "role": "tertiary", "displayName": "Accent Budget (bg)", "canonical": "#fffbeb" },
       "accent-budget-fg": { "role": "tertiary", "displayName": "Accent Budget (fg)", "canonical": "#d97706", "tonalRamp": ["#4a2902", "#864904", "#c26a05", "#f88a0c", "#faa747", "#fcc483", "#fde0be", "#fef3e6"] },
       "accent-apps-bg": { "role": "tertiary", "displayName": "Accent Apps (bg)", "canonical": "#ecfdf5" },
-      "accent-apps-fg": { "role": "tertiary", "displayName": "Accent Apps (fg)", "canonical": "#059669", "tonalRamp": ["#024a34", "#04855d", "#06c087", "#0df7ae", "#48f9c2", "#84fbd6", "#bffdea", "#e6fef7"] }
+      "accent-apps-fg": { "role": "tertiary", "displayName": "Accent Apps (fg)", "canonical": "#059669", "tonalRamp": ["#024a34", "#04855d", "#06c087", "#0df7ae", "#48f9c2", "#84fbd6", "#bffdea", "#e6fef7"] },
+      "accent-meals-bg": { "role": "tertiary", "displayName": "Accent Meals (bg)", "canonical": "#ffedd5" },
+      "accent-meals-fg": { "role": "tertiary", "displayName": "Accent Meals (fg)", "canonical": "#c2410c", "tonalRamp": ["#481804", "#822b08", "#bb3f0c", "#f05414", "#f47e4d", "#f8a887", "#fbd2c1", "#feeee7"] },
+      "accent-bus-bg": { "role": "tertiary", "displayName": "Accent Bus (bg)", "canonical": "#ecfeff" },
+      "accent-bus-fg": { "role": "tertiary", "displayName": "Accent Bus (fg)", "canonical": "#0e7490", "tonalRamp": ["#073846", "#0c657d", "#1292b5", "#1bbde9", "#53cdee", "#8bddf4", "#c3edf9", "#e8f8fd"] }
     },
     "typographyMeta": {
       "display": { "displayName": "Display", "purpose": "The 'Sanj's Planner' wordmark only. Never reused elsewhere." },
@@ -130,7 +134,8 @@
       "A single script wordmark (\"Ephesis\") reserved for the \"Sanj's Planner\" title only — everything else is Quicksand"
     ],
     "rules": [
-      { "name": "The One Accent Rule", "body": "Confident Indigo appears only on things you can act on (buttons, active tab, links, FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful.", "section": "colors" },
+      { "name": "The One Accent Rule", "body": "Confident Indigo appears only on things you can act on (buttons, active tab, links, FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful. This governs Indigo specifically; it does not restrict the Secondary/Tertiary category colors, which are meant to be used generously.", "section": "colors" },
+      { "name": "The Category Owns Its Color Rule", "body": "Once a UI element is about a specific category or status (a tab, a stat card, a status filter, a budget), it wears that category's own accent — never generic Indigo, never plain gray. A stat card's border tints to its own accent; a status filter's active state fills with that exact status's color; the active budget-switcher pill is Accent Budget, not Confident Indigo. Only truly generic, non-categorized actions (a primary Save button, the active tab pill itself, the FAB) get Confident Indigo. When adding a new category or status, give it a real accent and apply it to both its small chip and whatever container/pill represents it at rest.", "section": "colors" },
       { "name": "The One-Wordmark Rule", "body": "Ephesis renders exactly once per screen — the page title. Every other heading, however large, stays in Quicksand at a heavier weight instead of switching typeface.", "section": "typography" },
       { "name": "The Float-Only Shadow Rule", "body": "A visible shadow is a signal that something is temporarily above the page (a panel, a modal, a hovered card) — never a permanent decoration on static content.", "section": "elevation" }
     ],

@@ -33,6 +33,10 @@ colors:
   accent-budget-fg: "#d97706"
   accent-apps-bg: "#ecfdf5"
   accent-apps-fg: "#059669"
+  accent-meals-bg: "#ffedd5"
+  accent-meals-fg: "#c2410c"
+  accent-bus-bg: "#ecfeff"
+  accent-bus-fg: "#0e7490"
 typography:
   display:
     fontFamily: "Ephesis, cursive"
@@ -128,11 +132,13 @@ Soft pastel bg/fg pairs used for category tags, application-status badges, and m
 - **Periwinkle** (#e0e7ff / #4338ca): Dinner meal chips.
 
 ### Tertiary
-Feature-accent tints reserved for the Home tab's four dashboard stat cards (and the matching icon color elsewhere), distinct hexes from the Secondary set above even where the hue rhymes:
-- **Accent Shift** (#eff6ff / #2563eb): Shift stat card and icon.
-- **Accent Schedule** (#f5f3ff / #7c3aed): Schedule stat card and icon.
-- **Accent Budget** (#fffbeb / #d97706): Budget stat card and icon.
-- **Accent Apps** (#ecfdf5 / #059669): Applications stat card and icon.
+One feature-accent per tab — the app's six-color wayfinding system. Each tab's accent now colors that tab's own containers and pills (not just an icon), and the same six hexes are the only tab identities that exist; distinct from the Secondary set above even where a hue rhymes:
+- **Accent Shift** (#eff6ff / #2563eb): Home's Shift stat card and icon.
+- **Accent Schedule** (#f5f3ff / #7c3aed): Home's Schedule stat card, Schedule tab's toolbar top-border, inactive Schedule tab icon.
+- **Accent Budget** (#fffbeb / #d97706): Home's Budget stat card, the Budget tab's heading underline, the active budget-switcher pill, the category-header row wash, inactive Budget tab icon.
+- **Accent Apps** (#ecfdf5 / #059669): Home's Applications stat card, the Applications tab's heading underline, inactive Applications tab icon.
+- **Accent Meals** (#ffedd5 / #c2410c): the Meals tab's heading underline, inactive Meals tab icon. Deliberately the same hex as Secondary's Peach (lunch chips) — Meals' whole tab identity is that color family.
+- **Accent Bus** (#ecfeff / #0e7490): the Bus tab's heading underline, inactive Bus tab icon. The one tertiary hue with no Secondary-palette relative — introduced for Bus since transit had no existing color to inherit.
 
 ### Neutral
 - **Warm Ivory** (#f7f4ef): Page background.
@@ -142,7 +148,9 @@ Feature-accent tints reserved for the Home tab's four dashboard stat cards (and 
 - **Warm Taupe** (#716b66): Secondary/muted text — labels, captions, placeholders, helper copy. Darkened slightly from an earlier #78716c after a critique found it failing WCAG AA (4.5:1) against the page background and two of the four stat-card tints; this value clears AA against all of them.
 
 ### Named Rules
-**The One Accent Rule.** Confident Indigo appears only on things you can act on (buttons, the active tab, links, the FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful.
+**The One Accent Rule.** Confident Indigo appears only on things you can act on (buttons, the active tab, links, the FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful. This governs Indigo specifically; it does not restrict the Secondary/Tertiary category colors below, which are meant to be used generously.
+
+**The Category Owns Its Color Rule.** Once a UI element is *about* a specific category or status (a tab, a stat card, a status filter, a budget), it wears that category's own accent — never generic Indigo, never plain gray. A stat card's border tints to its own accent (not `--color-border`); a status filter's active state fills with that exact status's color (Interviewing = amber, Rejected = red — not one indigo for all six); the active budget-switcher pill is Accent Budget, not Confident Indigo. Only truly generic, non-categorized actions (a primary "Save" button, the active tab pill itself, the FAB) get Confident Indigo. When adding a new category or status anywhere, give it a real accent from this page and apply it to both its small chip *and* whatever container/pill represents it at rest — a color that only shows up in one place isn't finished.
 
 ## Typography
 
