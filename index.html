@@ -1379,6 +1379,7 @@
     window.scrollTo({ top: Math.max(target, 0), behavior: 'auto' });
   }
 
+  var updateScrollFade = null;
   function initScrollFade(){
     var scroller = document.getElementById('gridScroll');
     var fadeLeft = document.getElementById('fadeLeft');
@@ -1388,6 +1389,7 @@
       fadeLeft.classList.toggle('show', scroller.scrollLeft > 4);
       fadeRight.classList.toggle('show', scroller.scrollLeft < maxScroll - 4);
     }
+    updateScrollFade = update;
     scroller.addEventListener('scroll', update);
     window.addEventListener('resize', update);
     update();
@@ -1419,7 +1421,7 @@
       fabBtn.style.display = (name === 'budget' || name === 'meals' || name === 'bus') ? 'none' : '';
       fabBtn.setAttribute('aria-label', name === 'applications' ? 'Add application' : 'Add time block');
       if(name === 'home') renderHome();
-      if(name === 'schedule') scrollToNow();
+      if(name === 'schedule'){ scrollToNow(); if(updateScrollFade) updateScrollFade(); }
       if(name === 'meals') renderMeals();
       if(name === 'bus') renderBusTab();
     }
