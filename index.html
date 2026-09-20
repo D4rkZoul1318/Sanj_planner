@@ -90,7 +90,7 @@
     body{ transition:none; }
   }
   .wrap{ max-width:1100px; margin:0 auto; position:relative; }
-  .header-top-right{ position:absolute; top:0; right:0; display:flex; align-items:center; gap:10px; }
+  .header-top-right{ position:absolute; top:0; right:0; z-index:2; display:flex; align-items:center; gap:10px; }
   .settings-btn{ flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; }
   .settings-btn:hover{ border-color:var(--color-accent); color:var(--color-accent); }
   .settings-btn:active{ transform:scale(0.93); }
@@ -103,12 +103,9 @@
   .settings-menu-item:active{ transform:scale(0.98); }
   .settings-menu-item svg{ width:16px; height:16px; color:var(--color-text-muted); flex-shrink:0; }
   .settings-sync-status{ margin-top:6px; padding:8px 10px 2px; border-top:1px solid var(--color-border); font-size:12px; color:var(--color-text-muted); }
-  @media (min-width:641px){
-    .settings-panel{ display:none; }
-  }
+  #calendarBtn{ display:none; }
   @media (max-width:640px){
     .header-top-right{ position:static; margin:0 0 14px; justify-content:flex-end; }
-    #calendarBtn{ display:none; }
   }
   header{ position:relative; }
   h1{ font-size:44px; font-weight:800; letter-spacing:-0.02em; margin:0 0 4px; position:relative; z-index:1; }
@@ -519,9 +516,7 @@
   .sync-status.synced::before{ background:#059669; }
   .sync-status.syncing::before{ background:#d97706; animation:syncPulse 1s ease-in-out infinite; }
   .sync-status.offline::before{ background:#dc2626; }
-  @media (max-width:640px){
-    .backup-controls, .sync-status{ display:none; }
-  }
+  .backup-controls, .sync-status{ display:none; }
   @keyframes syncPulse{
     0%, 100%{ opacity:1; }
     50%{ opacity:0.4; }
@@ -2650,10 +2645,6 @@
   var settingsBtn = document.getElementById('settingsBtn');
   var settingsPanel = document.getElementById('settingsPanel');
 
-  function isMobileViewport(){
-    return window.matchMedia('(max-width:640px)').matches;
-  }
-
   function openSettingsPanel(){
     settingsPanel.classList.add('open');
     settingsBtn.setAttribute('aria-expanded', 'true');
@@ -2665,10 +2656,6 @@
   }
 
   settingsBtn.addEventListener('click', function(e){
-    if(!isMobileViewport()){
-      openChangePasscodeModal();
-      return;
-    }
     e.stopPropagation();
     if(shiftPanel.classList.contains('open')) closeShiftPanel();
     if(calendarPanel.classList.contains('open')) closeCalendarPanel();
