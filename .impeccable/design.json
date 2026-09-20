@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-20T08:59:19Z",
+  "title": "Design System: Sanj's Planner",
+  "extensions": {
+    "colorMeta": {
+      "confident-indigo": { "role": "primary", "displayName": "Confident Indigo", "canonical": "#4f46e5", "tonalRamp": ["#0d0943", "#171179", "#2119ae", "#2f24e0", "#625ae8", "#958fef", "#c8c5f7", "#eae9fc"] },
+      "confident-indigo-hover": { "role": "primary", "displayName": "Confident Indigo, Hover", "canonical": "#4338ca" },
+      "warm-ivory": { "role": "neutral", "displayName": "Warm Ivory", "canonical": "#f7f4ef", "tonalRamp": ["#332919", "#5c4b2e", "#856c42", "#ac8c58", "#c0a981", "#d5c5aa", "#e9e1d3", "#f6f3ee"] },
+      "paper-white": { "role": "neutral", "displayName": "Paper White", "canonical": "#ffffff", "tonalRamp": ["#262626", "#454545", "#636363", "#828282", "#a1a1a1", "#bfbfbf", "#dedede", "#f2f2f2"] },
+      "soft-stone": { "role": "neutral", "displayName": "Soft Stone", "canonical": "#e7e5e4", "tonalRamp": ["#282624", "#494441", "#69625e", "#89807b", "#a69f9b", "#c3bebc", "#e0dddc", "#f3f2f2"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#18181b", "tonalRamp": ["#242428", "#414149", "#5e5e69", "#7b7b89", "#9b9ba6", "#bbbbc3", "#dcdce0", "#f2f2f3"] },
+      "warm-taupe": { "role": "neutral", "displayName": "Warm Taupe", "canonical": "#716b66", "tonalRamp": ["#282624", "#484541", "#69635e", "#88817c", "#a5a09c", "#c3bfbc", "#e0dedc", "#f3f2f2"] },
+      "soft-blue-bg": { "role": "secondary", "displayName": "Soft Blue (bg)", "canonical": "#dbeafe" },
+      "soft-blue-fg": { "role": "secondary", "displayName": "Soft Blue (fg)", "canonical": "#1d4ed8", "tonalRamp": ["#091843", "#102c79", "#183faf", "#2355e1", "#597ee9", "#8fa8f0", "#c5d2f7", "#e9eefc"] },
+      "soft-green-bg": { "role": "secondary", "displayName": "Soft Green (bg)", "canonical": "#d1fae5" },
+      "soft-green-fg": { "role": "secondary", "displayName": "Soft Green (fg)", "canonical": "#047857", "tonalRamp": ["#024a36", "#048561", "#06c08c", "#0df7b4", "#48f9c7", "#84fbd9", "#bffdeb", "#e6fef7"] },
+      "soft-violet-bg": { "role": "secondary", "displayName": "Soft Violet (bg)", "canonical": "#ede9fe" },
+      "soft-violet-fg": { "role": "secondary", "displayName": "Soft Violet (fg)", "canonical": "#6d28d9", "tonalRamp": ["#200b41", "#3a1575", "#541ea9", "#6f2bd9", "#925fe3", "#b593ec", "#d9c7f5", "#f0e9fb"] },
+      "soft-amber-bg": { "role": "secondary", "displayName": "Soft Amber (bg)", "canonical": "#fef3c7" },
+      "soft-amber-fg": { "role": "secondary", "displayName": "Soft Amber (fg)", "canonical": "#b45309", "tonalRamp": ["#492204", "#833c07", "#bd5709", "#f37311", "#f6954b", "#f9b786", "#fcdac0", "#fef1e7"] },
+      "soft-red-bg": { "role": "secondary", "displayName": "Soft Red (bg)", "canonical": "#fee2e2" },
+      "soft-red-fg": { "role": "secondary", "displayName": "Soft Red (fg)", "canonical": "#b91c1c", "tonalRamp": ["#420a0a", "#781212", "#ad1a1a", "#de2626", "#e65b5b", "#ee9090", "#f6c5c5", "#fce9e9"] },
+      "soft-gray-bg": { "role": "secondary", "displayName": "Soft Gray (bg)", "canonical": "#f4f4f5" },
+      "soft-gray-fg": { "role": "secondary", "displayName": "Soft Gray (fg)", "canonical": "#52525b", "tonalRamp": ["#242428", "#414148", "#5e5e69", "#7c7c89", "#9c9ca6", "#bcbcc3", "#dcdce0", "#f2f2f3"] },
+      "peach-bg": { "role": "secondary", "displayName": "Peach (bg)", "canonical": "#ffedd5" },
+      "peach-fg": { "role": "secondary", "displayName": "Peach (fg)", "canonical": "#c2410c", "tonalRamp": ["#481804", "#822b08", "#bb3f0c", "#f05414", "#f47e4d", "#f8a887", "#fbd2c1", "#feeee7"] },
+      "periwinkle-bg": { "role": "secondary", "displayName": "Periwinkle (bg)", "canonical": "#e0e7ff" },
+      "periwinkle-fg": { "role": "secondary", "displayName": "Periwinkle (fg)", "canonical": "#4338ca", "tonalRamp": ["#13103c", "#231d6d", "#332a9d", "#453aca", "#726ad7", "#a09ae4", "#cecbf1", "#ecebfa"] },
+      "accent-shift-bg": { "role": "tertiary", "displayName": "Accent Shift (bg)", "canonical": "#eff6ff" },
+      "accent-shift-fg": { "role": "tertiary", "displayName": "Accent Shift (fg)", "canonical": "#2563eb", "tonalRamp": ["#061a46", "#0c2f7e", "#1145b6", "#1a5bea", "#5283ef", "#8aabf4", "#c2d4f9", "#e8eefd"] },
+      "accent-schedule-bg": { "role": "tertiary", "displayName": "Accent Schedule (bg)", "canonical": "#f5f3ff" },
+      "accent-schedule-fg": { "role": "tertiary", "displayName": "Accent Schedule (fg)", "canonical": "#7c3aed", "tonalRamp": ["#1e0646", "#360c7e", "#4e11b6", "#671aea", "#8c52ef", "#b18af4", "#d7c2f9", "#efe8fd"] },
+      "accent-budget-bg": { "role": "tertiary", "displayName": "Accent Budget (bg)", "canonical": "#fffbeb" },
+      "accent-budget-fg": { "role": "tertiary", "displayName": "Accent Budget (fg)", "canonical": "#d97706", "tonalRamp": ["#4a2902", "#864904", "#c26a05", "#f88a0c", "#faa747", "#fcc483", "#fde0be", "#fef3e6"] },
+      "accent-apps-bg": { "role": "tertiary", "displayName": "Accent Apps (bg)", "canonical": "#ecfdf5" },
+      "accent-apps-fg": { "role": "tertiary", "displayName": "Accent Apps (fg)", "canonical": "#059669", "tonalRamp": ["#024a34", "#04855d", "#06c087", "#0df7ae", "#48f9c2", "#84fbd6", "#bffdea", "#e6fef7"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The 'Sanj's Planner' wordmark only. Never reused elsewhere." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles: dashboard greeting, modal titles, tab-panel headings." },
+      "body": { "displayName": "Body", "purpose": "Default running text, subtitles, form values." },
+      "label": { "displayName": "Label", "purpose": "Stat labels, table headers, badges, meta/timestamp text." }
+    },
+    "shadows": [
+      { "name": "resting", "value": "0 1px 3px rgba(24,24,27,0.05)", "purpose": "Default state for cards, tables, and list containers." },
+      { "name": "hover-lift", "value": "0 6px 16px rgba(24,24,27,0.12)", "purpose": "Cards and time-blocks on hover, paired with translateY(-1px to -2px)." },
+      { "name": "floating", "value": "0 8px 24px rgba(24,24,27,0.14)", "purpose": "Popovers, shift/calendar panels, modal sheets." },
+      { "name": "floating-fab", "value": "0 8px 20px rgba(79,70,229,0.35)", "purpose": "The floating add button, using a tinted indigo shadow instead of neutral black." }
+    ],
+    "motion": [
+      { "name": "press-down", "value": "transform: scale(0.93-0.98); transition: transform 150ms ease-out", "purpose": "Universal tactile press feedback on every tappable element; scale amount tuned to control size." },
+      { "name": "ease-standard", "value": "150ms ease-out", "purpose": "Default transition duration/easing for color, border, and background-color state changes." },
+      { "name": "ease-hover-lift", "value": "120-150ms ease-out", "purpose": "Hover translateY + shadow transitions on cards and time-blocks." }
+    ],
+    "breakpoints": [
+      { "name": "mobile-max", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action pill button (e.g. 'Add block', 'Add application').",
+      "html": "<button class=\"ds-btn-primary\">Add block</button>",
+      "css": ".ds-btn-primary { background: #4f46e5; color: #fff; border: none; border-radius: 999px; padding: 9px 18px; font-family: Quicksand, sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 150ms ease-out, transform 150ms ease-out; } .ds-btn-primary:hover { background: #4338ca; } .ds-btn-primary:active { transform: scale(0.97); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary/low-emphasis text button (e.g. 'Clear schedule', '+ Add item').",
+      "html": "<button class=\"ds-btn-ghost\">Clear schedule</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: #716b66; border: none; border-radius: 999px; padding: 9px 18px; font-family: Quicksand, sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: color 150ms ease-out, transform 150ms ease-out; } .ds-btn-ghost:hover { color: #18181b; } .ds-btn-ghost:active { transform: scale(0.97); }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "The primary tab navigation: a pill container holding icon+label tab buttons, active tab filled indigo.",
+      "html": "<div class=\"ds-tab-nav\"><button class=\"ds-tab-btn ds-tab-btn--active\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"></path><polyline points=\"9 22 9 12 15 12 15 22\"></polyline></svg>Home</button><button class=\"ds-tab-btn\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"></line><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"></line><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"></line></svg>Schedule</button></div>",
+      "css": ".ds-tab-nav { display: flex; gap: 4px; padding: 4px; width: fit-content; background: #ffffff; border: 1px solid #e7e5e4; border-radius: 999px; box-shadow: 0 1px 3px rgba(24,24,27,0.05); } .ds-tab-btn { display: flex; align-items: center; gap: 6px; background: none; border: none; padding: 9px 16px; font-family: Quicksand, sans-serif; font-size: 14px; font-weight: 600; color: #716b66; cursor: pointer; border-radius: 999px; transition: background-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out; } .ds-tab-btn:hover { color: #18181b; } .ds-tab-btn:active { transform: scale(0.97); } .ds-tab-btn--active { background: #4f46e5; color: #fff; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Standard content card/container used across all tabs.",
+      "html": "<div class=\"ds-card\">Card content</div>",
+      "css": ".ds-card { border: 1px solid #e7e5e4; border-radius: 10px; background: #ffffff; padding: 16px; box-shadow: 0 1px 3px rgba(24,24,27,0.05); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "description": "Standard form field used in modals and inline editing.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Title\" />",
+      "css": ".ds-input { width: 100%; padding: 9px 10px; border: 1px solid #e7e5e4; border-radius: 8px; font-size: 14px; font-family: Quicksand, sans-serif; background: #ffffff; color: #18181b; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "description": "Application status / category tag chip using a Secondary palette pair.",
+      "html": "<span class=\"ds-badge\">Interviewing</span>",
+      "css": ".ds-badge { display: inline-block; border-radius: 999px; padding: 3px 10px; font-family: Quicksand, sans-serif; font-size: 11px; font-weight: 700; white-space: nowrap; background: #fef3c7; color: #b45309; }"
+    },
+    {
+      "name": "Removable Chip",
+      "kind": "chip",
+      "description": "Meal/budget chip with an inline remove affordance.",
+      "html": "<span class=\"ds-chip\">Tofu rice burrito<button class=\"ds-chip-x\" aria-label=\"Remove\">×</button></span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 4px; background: #e0e7ff; color: #4338ca; border-radius: 999px; padding: 4px 4px 4px 12px; font-family: Quicksand, sans-serif; font-size: 13px; font-weight: 600; } .ds-chip-x { background: none; border: none; color: inherit; cursor: pointer; font-size: 14px; line-height: 1; padding: 2px; }"
+    },
+    {
+      "name": "Time Block",
+      "kind": "custom",
+      "description": "Signature component: an absolutely-positioned schedule-grid event card with a colored left border accent.",
+      "html": "<div class=\"ds-event\"><span class=\"ds-event-title\">Work shift</span><span class=\"ds-event-meta\">14:00–17:30</span></div>",
+      "css": ".ds-event { border-radius: 6px; padding: 5px 8px 5px 9px; font-family: Quicksand, sans-serif; font-size: 12px; line-height: 1.3; overflow: hidden; cursor: pointer; border-left: 3px solid #7c3aed; background: #ede9fe; color: #6d28d9; box-shadow: 0 1px 2px rgba(24,24,27,0.06); transition: transform 120ms ease-out, box-shadow 120ms ease-out; } .ds-event:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(24,24,27,0.14); } .ds-event-title { font-weight: 700; display: block; } .ds-event-meta { display: block; font-size: 11px; font-weight: 500; opacity: 0.85; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Warm Notebook",
+    "overview": "Sanj's Planner reads like a well-kept paper planner, not a corporate dashboard: an ivory page, soft pastel tab colors for each life category, and one confident indigo used sparingly for anything actionable. It is a personal, single-user tool built to be glanced at dozens of times a day — on a phone between classes, on a laptop before a shift — so it stays calm, legible, and fast rather than expressive or decorative. There is no dark mode and no ambient/animated background: an earlier ambient sky-gradient and dark-mode concept was built and explicitly rejected as \"not working,\" and the system settled on a single flat, warm, light theme instead. Every interactive element gives the same small, quiet confirmation on press — a slight scale-down — rather than a color flash or ripple.",
+    "keyCharacteristics": [
+      "Flat, warm-neutral canvas (ivory page, white cards) with one saturated accent color used deliberately",
+      "A distinct soft-pastel color per life category (classes, shifts, meals, budget, applications) for at-a-glance scanning",
+      "Fully rounded pill shapes for anything tappable; softly rounded corners everywhere else",
+      "Near-flat elevation at rest; a real shadow appears only when something floats above the page",
+      "A single script wordmark (\"Ephesis\") reserved for the \"Sanj's Planner\" title only — everything else is Quicksand"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Confident Indigo appears only on things you can act on (buttons, active tab, links, FAB, focus rings). It never appears as a background tint or decoration — that restraint is what keeps it meaningful.", "section": "colors" },
+      { "name": "The One-Wordmark Rule", "body": "Ephesis renders exactly once per screen — the page title. Every other heading, however large, stays in Quicksand at a heavier weight instead of switching typeface.", "section": "typography" },
+      { "name": "The Float-Only Shadow Rule", "body": "A visible shadow is a signal that something is temporarily above the page (a panel, a modal, a hovered card) — never a permanent decoration on static content.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reserve Confident Indigo for actionable elements only (buttons, active tab, links, FAB, focus rings) — never as a decorative fill or background tint.",
+      "Do apply the universal press-down scale (transform: scale(0.93-0.98), ~150ms ease-out) to every new tappable element.",
+      "Do use the existing Secondary/Tertiary pastel pairs for any new category or status, rather than introducing a new hue.",
+      "Do keep shadows near-invisible on static content and reserve a visible shadow for anything that floats above the page."
+    ],
+    "donts": [
+      "Don't reintroduce an ambient gradient background, animated sky, or dark mode — both were built and explicitly rejected; the system is a single flat, warm, light theme by deliberate decision, not by omission.",
+      "Don't use the Ephesis script font anywhere except the single \"Sanj's Planner\" wordmark.",
+      "Don't add a border-and-shadow combination to a resting card — pick one (border for list/table containers, shadow-only for freestanding cards) rather than stacking both as a default.",
+      "Don't introduce a new framework, build step, or npm dependency to achieve a visual effect this system doesn't already support with plain CSS."
+    ]
+  }
+}
