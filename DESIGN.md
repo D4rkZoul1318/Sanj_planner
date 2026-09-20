@@ -71,7 +71,6 @@ typography:
     fontWeight: 700
     lineHeight: 1.3
 rounded:
-  tape: "2px"
   xs: "6px"
   sm: "8px"
   md: "10px"
@@ -106,9 +105,6 @@ components:
   card:
     backgroundColor: "{colors.paper-white}"
     rounded: "{rounded.md}"
-  title-tape:
-    backgroundColor: "rgba(217,119,6,0.45)"
-    rounded: "{rounded.tape}"
 ---
 
 # Design System: Sanj's Planner
@@ -238,9 +234,6 @@ Two corner languages, chosen by purpose: fully rounded pills (`border-radius: 99
 
 ### Time Blocks (signature component)
 The Schedule tab's positioned event blocks are the app's most distinctive custom component: an absolutely-positioned card with a 3px solid left border in the category's saturated color, that category's soft tint as background, a bold title line and a smaller muted time-range line beneath it, 6px corner radius, and the same hover-lift / active-press behavior as every other interactive element. Three color families only (College/blue, Personal/green, Work-Other/violet) keep a dense week grid scannable at a glance.
-
-### Washi Tape (signature component)
-A small rotated strip of translucent color (`title-tape`, 2px radius, -4deg rotation) sits behind the "Sanj's Planner" wordmark like a real piece of tape holding down a notebook page corner — the app's one purely decorative personality touch, reinforcing the physical-notebook metaphor without animation or sound. Plain translucent color plus a single soft gradient only; no repeating-stripe texture (a known generated-UI tell the first version of this component used and was corrected away from).
 
 ## Do's and Don'ts
 
