@@ -462,6 +462,7 @@
   @media (max-width:760px){ .home-two-col{ grid-template-columns:1fr; } }
 
   .home-upnext-list{ display:flex; flex-direction:column; gap:10px; }
+  .home-upnext-list > .app-empty{ border:1px solid var(--color-border); border-radius:var(--radius); background:var(--color-surface); box-shadow:0 1px 3px rgba(24,24,27,0.05); }
   .upnext-item{
     border:1px solid var(--color-border);
     border-left:3px solid transparent;
@@ -600,7 +601,7 @@
       <button type="button" class="settings-btn" id="settingsBtn" aria-haspopup="true" aria-expanded="false" aria-label="Settings" title="Settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       </button>
-      <div class="shift-panel settings-panel" id="settingsPanel">
+      <div class="shift-panel settings-panel" id="settingsPanel" inert>
         <div class="settings-panel-inner">
           <button type="button" class="settings-menu-item" id="settingsCalendarItem">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -632,7 +633,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         <span id="shiftTodayText">Today: —</span>
       </button>
-      <div class="shift-panel" id="shiftPanel">
+      <div class="shift-panel" id="shiftPanel" inert>
         <div class="shift-panel-list" id="shiftPanelList"></div>
       </div>
     </div>
@@ -641,7 +642,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
         <span>Calendar</span>
       </button>
-      <div class="shift-panel" id="calendarPanel">
+      <div class="shift-panel" id="calendarPanel" inert>
         <div class="calendar-panel-inner" id="calendarPanelInner"></div>
       </div>
     </div>
@@ -879,7 +880,7 @@
 <div class="saved-toast" id="savedToast" role="status" aria-live="polite">Saved</div>
 <div class="saved-toast milestone-toast" id="milestoneToast" role="status" aria-live="polite"></div>
 
-<div class="overlay" id="syncCodeOverlay">
+<div class="overlay" id="syncCodeOverlay" inert>
   <div class="modal">
     <h2 id="syncModalTitle">Sync this planner</h2>
     <p class="hint" id="syncModalHint" style="margin:0 0 14px;">Create a passcode to sync your data across devices, or enter one from another device to restore it here.</p>
@@ -895,7 +896,7 @@
   </div>
 </div>
 
-<div class="overlay" id="overlay">
+<div class="overlay" id="overlay" inert>
   <div class="modal">
     <h2 id="modalTitle">Add time block</h2>
     <form id="eventForm">
@@ -951,7 +952,7 @@
   </div>
 </div>
 
-<div class="overlay" id="budgetNameOverlay">
+<div class="overlay" id="budgetNameOverlay" inert>
   <div class="modal">
     <h2>Name this budget</h2>
     <form id="budgetNameForm">
@@ -970,7 +971,7 @@
   </div>
 </div>
 
-<div class="overlay" id="appOverlay">
+<div class="overlay" id="appOverlay" inert>
   <div class="modal">
     <h2 id="appModalTitle">Add application</h2>
     <form id="appForm">
@@ -1507,12 +1508,14 @@
       document.getElementById('f-end').value = '10:00';
       deleteBtn.style.display = 'none';
     }
+    overlay.removeAttribute('inert');
     overlay.classList.add('open');
     setTimeout(function(){ document.getElementById('f-title').focus(); }, 50);
   }
 
   function closeModal(){
     overlay.classList.remove('open');
+    overlay.setAttribute('inert', '');
     editingId = null;
   }
 
@@ -1949,12 +1952,14 @@
   function openBudgetNameModal(){
     budgetNameForm.reset();
     budgetNameError.classList.remove('show');
+    budgetNameOverlay.removeAttribute('inert');
     budgetNameOverlay.classList.add('open');
     setTimeout(function(){ budgetNameInput.focus(); }, 50);
   }
 
   function closeBudgetNameModal(){
     budgetNameOverlay.classList.remove('open');
+    budgetNameOverlay.setAttribute('inert', '');
   }
 
   budgetNameForm.addEventListener('submit', function(e){
@@ -2200,12 +2205,14 @@
       appReferralNameField.style.display = 'none';
       appDeleteBtn.style.display = 'none';
     }
+    appOverlay.removeAttribute('inert');
     appOverlay.classList.add('open');
     setTimeout(function(){ document.getElementById('fa-company').focus(); }, 50);
   }
 
   function closeAppModal(){
     appOverlay.classList.remove('open');
+    appOverlay.setAttribute('inert', '');
     editingAppId = null;
   }
 
@@ -2420,12 +2427,14 @@
   function openShiftPanel(){
     shiftExpandedDay = null;
     renderShiftPanel();
+    shiftPanel.removeAttribute('inert');
     shiftPanel.classList.add('open');
     shiftTodayBtn.setAttribute('aria-expanded', 'true');
   }
 
   function closeShiftPanel(){
     shiftPanel.classList.remove('open');
+    shiftPanel.setAttribute('inert', '');
     shiftTodayBtn.setAttribute('aria-expanded', 'false');
   }
 
@@ -2618,12 +2627,14 @@
 
   function openCalendarPanel(){
     renderCalendarPanel();
+    calendarPanel.removeAttribute('inert');
     calendarPanel.classList.add('open');
     calendarBtn.setAttribute('aria-expanded', 'true');
   }
 
   function closeCalendarPanel(){
     calendarPanel.classList.remove('open');
+    calendarPanel.setAttribute('inert', '');
     calendarBtn.setAttribute('aria-expanded', 'false');
   }
 
@@ -2646,12 +2657,14 @@
   var settingsPanel = document.getElementById('settingsPanel');
 
   function openSettingsPanel(){
+    settingsPanel.removeAttribute('inert');
     settingsPanel.classList.add('open');
     settingsBtn.setAttribute('aria-expanded', 'true');
   }
 
   function closeSettingsPanel(){
     settingsPanel.classList.remove('open');
+    settingsPanel.setAttribute('inert', '');
     settingsBtn.setAttribute('aria-expanded', 'false');
   }
 
@@ -2728,9 +2741,17 @@
     if(el) el.textContent = DAY_NAMES_FULL[getTodayIndex()] + ', ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getDate();
   }
 
+  function getDateForWeekday(dayIndex){
+    var now = bostonNow();
+    var monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - getTodayIndex());
+    var target = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + dayIndex);
+    return { y: target.getFullYear(), m: target.getMonth(), d: target.getDate() };
+  }
+
   function selectDay(dayIndex){
     selectedDayIndex = dayIndex;
-    selectedCalDate = null;
+    selectedCalDate = getDateForWeekday(dayIndex);
+    miniCalMonth = new Date(selectedCalDate.y, selectedCalDate.m, 1);
     renderWeekStrip();
     renderHomeGreeting();
     renderHomeUpNext();
@@ -3204,6 +3225,7 @@
     syncModalHint.textContent = 'Create a passcode to sync your data across devices, or enter one from another device to restore it here.';
     syncCodeError.classList.remove('show');
     syncCodeInput.value = '';
+    syncCodeOverlay.removeAttribute('inert');
     syncCodeOverlay.classList.add('open');
     setTimeout(function(){ syncCodeInput.focus(); }, 50);
   }
@@ -3216,12 +3238,14 @@
       : 'Create a passcode to sync your data across devices, or enter one from another device to restore it here.';
     syncCodeError.classList.remove('show');
     syncCodeInput.value = '';
+    syncCodeOverlay.removeAttribute('inert');
     syncCodeOverlay.classList.add('open');
     setTimeout(function(){ syncCodeInput.focus(); }, 50);
   }
 
   function closeSyncCodeModal(){
     syncCodeOverlay.classList.remove('open');
+    syncCodeOverlay.setAttribute('inert', '');
   }
 
   document.getElementById('syncGenerateBtn').addEventListener('click', function(){

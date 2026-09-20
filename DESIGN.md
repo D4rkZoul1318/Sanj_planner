@@ -250,6 +250,8 @@ A small rotated strip of translucent color (`title-tape`, 2px radius, -4deg rota
 - **Do** use the existing Secondary/Tertiary pastel pairs for any new category or status, rather than introducing a new hue.
 - **Do** keep shadows near-invisible on static content and reserve a visible shadow for anything that floats above the page.
 - **Do** tint secondary/muted text from the surface's own hue when it sits on a colored page background — never plain gray on a colored surface (see Background above).
+- **Do** mark every floating panel/modal `inert` while closed (toggled alongside its `.open` class), not just visually hidden via opacity/pointer-events — otherwise a closed panel's controls stay in the keyboard tab order, invisible but focusable.
+- **Do** give a sibling section the same container treatment (border/background/shadow) as its structural twin, even in an empty state — two side-by-side sections at the same hierarchy level (e.g. two "Today at a glance" list panels) should look like the same kind of thing.
 
 ### Don't:
 - **Don't** reintroduce an ambient gradient background, animated sky, or dark mode — both were built and explicitly rejected; the system is a single flat, warm, light theme by deliberate decision, not by omission. The per-tab page wash is a different device (a static, deliberate-palette tint per tab, not an atmospheric or animated gradient) and does not reopen that rejection.
