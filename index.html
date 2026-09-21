@@ -439,6 +439,16 @@
   .stat-card.acc-apps .stat-card-icon{ background:rgba(5,150,105,0.16); color:var(--acc-apps); }
   .stat-card.acc-apps .stat-card-value{ color:var(--acc-apps); }
 
+  /* Headline cards (Budget, Applications) carry the numbers Sanj actually tracks —
+     bigger, tighter-tracked, tabular figures make them the first thing the eye lands on.
+     Quiet cards (Shift, Schedule) are today's status, not a running number: same accent
+     wayfinding via icon + value color, but on a calm white surface so they recede. */
+  .stat-card--headline .stat-card-value{ font-size:30px; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; }
+  .stat-card--headline .stat-card-icon{ width:36px; height:36px; }
+  .stat-card--headline .stat-card-icon svg{ width:20px; height:20px; }
+  .stat-card.acc-shift.stat-card--quiet{ background:var(--color-surface); border-color:var(--color-border); }
+  .stat-card.acc-schedule.stat-card--quiet{ background:var(--color-surface); border-color:var(--color-border); }
+
   @keyframes statCardIn{
     from{ opacity:0; transform:translateY(8px); }
     to{ opacity:1; transform:translateY(0); }
@@ -694,24 +704,24 @@
       <h2>Today at a glance</h2>
     </div>
     <div class="stat-card-row" id="statCardRow">
-      <button type="button" class="stat-card acc-shift" id="statCardShift" aria-label="Today's shift, opens shift details">
+      <button type="button" class="stat-card acc-shift stat-card--quiet" id="statCardShift" aria-label="Today's shift, opens shift details">
         <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
         <span class="stat-card-label">Shift</span>
         <span class="stat-card-value" id="statShiftValue">—</span>
       </button>
-      <button type="button" class="stat-card acc-schedule" id="statCardSchedule" aria-label="Schedule, view Schedule tab">
+      <button type="button" class="stat-card acc-schedule stat-card--quiet" id="statCardSchedule" aria-label="Schedule, view Schedule tab">
         <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
         <span class="stat-card-label">Schedule</span>
         <span class="stat-card-value" id="statScheduleValue">—</span>
         <span class="stat-card-sub" id="statScheduleSub"></span>
       </button>
-      <button type="button" class="stat-card acc-budget" id="statCardBudget" aria-label="Budget, view Budget tab">
+      <button type="button" class="stat-card acc-budget stat-card--headline" id="statCardBudget" aria-label="Budget, view Budget tab">
         <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span>
         <span class="stat-card-label">Budget</span>
         <span class="stat-card-value" id="statBudgetValue">$0.00</span>
         <span class="stat-card-sub" id="statBudgetSub"></span>
       </button>
-      <button type="button" class="stat-card acc-apps" id="statCardApps" aria-label="Applications, view Applications tab">
+      <button type="button" class="stat-card acc-apps stat-card--headline" id="statCardApps" aria-label="Applications, view Applications tab">
         <span class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
         <span class="stat-card-label">Applications</span>
         <span class="stat-card-value" id="statAppsValue">0</span>

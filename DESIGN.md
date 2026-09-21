@@ -70,6 +70,12 @@ typography:
     fontSize: "12px"
     fontWeight: 700
     lineHeight: 1.3
+  headlineNumber:
+    fontFamily: "Quicksand, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif"
+    fontSize: "30px"
+    fontWeight: 800
+    lineHeight: 1.2
+    letterSpacing: "-0.03em"
 rounded:
   xs: "6px"
   sm: "8px"
@@ -180,9 +186,12 @@ Muted text (`.sub`, `.hint`) that sits directly on a tab's wash — not inside a
 - **Headline** (800, 16-18px, -0.01em tracking): section titles ("Good morning, Sanj", modal titles, "Budgets", "Applications").
 - **Body** (500, 14px): default running text, subtitles, form values.
 - **Label** (600-700, 11-13px): stat card labels, table headers, badges, meta text, timestamps. Often paired with Warm Taupe for de-emphasis.
+- **Headline Number** (800, 30px, -0.03em tracking, tabular-nums): the Home dashboard's Budget and Applications stat values only — the two numbers Sanj actually tracks over time (a running total, a running count), as opposed to Shift/Schedule's status phrases. Deliberately louder than the 22px used everywhere else numbers appear, so it reads as the number to check first.
 
 ### Named Rules
 **The One-Wordmark Rule.** Ephesis renders exactly once per screen — the page title. Every other heading, however large, stays in Quicksand at a heavier weight instead of switching typeface.
+
+**The Headline Stat Rule.** On the Home dashboard's "Today at a glance" row, a stat card is either a *headline* (a number Sanj tracks over time — Budget, Applications: bigger tabular-nums value, keeps its accent-tinted background) or *quiet* (today's status, not a running number — Shift, Schedule: same accent identity via icon and value color, but on a plain Paper White card so it recedes). Never let all four cards carry equal visual weight regardless of whether their content is actually a number — that flatness is what makes a glanceable dashboard hard to scan.
 
 ## Layout
 
